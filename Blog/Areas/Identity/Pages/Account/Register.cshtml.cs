@@ -41,6 +41,18 @@ namespace Blog.Areas.Identity.Pages.Account
         public class InputModel
         {
             [Required]
+            [DataType(DataType.Text)]
+            [StringLength(30, MinimumLength = 3)]
+            [Display(Name = "Full name")]
+            public string Name { get; set; }
+
+            [Required]
+            [DataType(DataType.Text)]
+            [StringLength(15, MinimumLength = 3)]
+            [Display(Name = "Display name")]
+            public string DisplayName { get; set; }
+
+            [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }

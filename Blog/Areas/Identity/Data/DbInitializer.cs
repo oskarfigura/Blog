@@ -26,15 +26,15 @@ namespace Blog.Areas.Identity.Data
         private const string editorRole = "Editor";
         private const string followerRole = "Follower";
 
-        private const string creatingCommentsClaim = "";
-        private const string deletingCommentsClaim = "";
-        private const string accessingUserManagerClaim = "";
-        private const string editingUsersClaim = "";
-        private const string deletingUsersClaim = "";
-        private const string changingUserPermissionsClaim = "";
-        private const string editingPostsClaim = "";
-        private const string creatingPostsClaim = "";
-        private const string deletingPostsClaim = "";
+        private const string creatingCommentsClaim = "CanComment";
+        private const string deletingCommentsClaim = "CanDeleteComments";
+        private const string accessingAccountManagerClaim = "CanAccessAccountManager";
+        private const string editingUsersClaim = "CanEditUsers";
+        private const string deletingUsersClaim = "CanDeleteUsers";
+        private const string changingUserPermissionsClaim = "CanChangeUserPermissions";
+        private const string editingPostsClaim = "CanEditUsers";
+        private const string creatingPostsClaim = "CanCreatePosts";
+        private const string deletingPostsClaim = "CanDeletePosts";
 
 
         //Seed database with default data 
@@ -80,7 +80,7 @@ namespace Blog.Areas.Identity.Data
             {
                 string[] claims = { creatingCommentsClaim, deletingCommentsClaim, editingPostsClaim,
                                     creatingPostsClaim, deletingPostsClaim, editingUsersClaim,
-                                     deletingUsersClaim, accessingUserManagerClaim, changingUserPermissionsClaim };
+                                     deletingUsersClaim, accessingAccountManagerClaim, changingUserPermissionsClaim };
 
                 await AddClaimsToRole(claims, roleManager, role);
             }
@@ -88,7 +88,7 @@ namespace Blog.Areas.Identity.Data
             {
                 string[] claims = { creatingCommentsClaim, deletingCommentsClaim, editingPostsClaim,
                                     creatingPostsClaim, deletingPostsClaim, editingUsersClaim, deletingUsersClaim,
-                                    accessingUserManagerClaim, changingUserPermissionsClaim };
+                                    accessingAccountManagerClaim, changingUserPermissionsClaim };
 
                 await AddClaimsToRole(claims, roleManager, role);
             }

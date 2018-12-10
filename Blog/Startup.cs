@@ -49,7 +49,7 @@ namespace Blog
                 options.AddPolicy("CanEditUsers", policy => policy.RequireClaim("CanEditUsers", "true"));
                 options.AddPolicy("CanDeleteUsers", policy => policy.RequireClaim("CanDeleteUsers", "true"));
                 options.AddPolicy("CanChangeUserPermissions", policy => policy.RequireClaim("CanChangeUserPermissions", "true"));
-                options.AddPolicy("CanAccessUserManager", policy => policy.RequireClaim("CanAccessUserManager", "true"));
+                options.AddPolicy("CanAccessAccountManager", policy => policy.RequireClaim("CanAccessAccountManager", "true"));
             });
         }
 

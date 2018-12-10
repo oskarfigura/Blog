@@ -28,22 +28,23 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Blog</a>
+                <a asp-area="" asp-controller="Blog" asp-action="Index" class="navbar-brand">Blog</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    @if ((await AuthorizationService.AuthorizeAsync(User, "IsAdmin")).Succeeded)
+                    @if ((await AuthorizationService.AuthorizeAsync(User, "CanAccessAccountManager")).Succeeded)
                     {
                         <li><a asp-area="" asp-controller="AccountManager" asp-action="Index">Account Manager</a></li>
                     }
-                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+                    @if ((await AuthorizationService.AuthorizeAsync(User, "CanCreatePosts")).Succeeded)
+                    {
+                        <li><a asp-area="" asp-controller="Blog" asp-action="Create">Create Post</a></li>
+                    }
                 </ul>
+                <partial name="_LoginPartial" />
             </div>
         </div>
     </nav>
-
-    <partial name="_LoginPartial" />
 
     <div class="container body-content">
         @RenderBody()
