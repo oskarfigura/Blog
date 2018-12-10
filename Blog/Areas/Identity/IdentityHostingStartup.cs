@@ -16,12 +16,7 @@ namespace Blog.Areas.Identity
         public void Configure(IWebHostBuilder builder)
         {
             builder.ConfigureServices((context, services) => {
-                services.AddDbContext<BlogContext>(options =>
-                    options.UseSqlServer(
-                        context.Configuration.GetConnectionString("BlogContextConnection")));
 
-                services.AddDefaultIdentity<BlogUser>()
-                    .AddEntityFrameworkStores<BlogContext>();
             });
         }
     }

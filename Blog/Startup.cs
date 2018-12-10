@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -37,8 +38,13 @@ namespace Blog
             services.AddDbContext<BlogContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("BlogContextConnection")));
 
+            services.AddIdentity<BlogUser, IdentityRole>()
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<BlogContext>()
+                .AddDefaultUI();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("CanComment", policy => policy.RequireClaim("CanComment", "true"));

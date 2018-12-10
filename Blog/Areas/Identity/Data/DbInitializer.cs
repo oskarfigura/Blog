@@ -166,9 +166,9 @@ namespace Blog.Areas.Identity.Data
             }
         }
 
-        private async Task SeedBlogPosts()
-        {
+        //private async Task SeedBlogPosts()
+        //{
 
-        }
+        //}
     }
 }

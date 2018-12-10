@@ -41,6 +41,16 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
         public class InputModel
         {
             [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Full name")]
+            public string Name { get; set; }
+
+            [Required]
+            [DataType(DataType.Text)]
+            [Display(Name = "Display name")]
+            public string DisplayName { get; set; }
+
+            [Required]
             [EmailAddress]
             public string Email { get; set; }
 
@@ -65,6 +75,8 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
+                Name = user.Name,
+                DisplayName = user.DisplayName,
                 Email = email,
                 PhoneNumber = phoneNumber
             };
@@ -85,6 +97,16 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            if (Input.Name != user.Name)
+            {
+                user.Name = Input.Name;
+            }
+
+            if (Input.DisplayName != user.DisplayName)
+            {
+                user.DisplayName = Input.DisplayName;
             }
 
             var email = await _userManager.GetEmailAsync(user);
