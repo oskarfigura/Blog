@@ -7,34 +7,29 @@
 <h2>@ViewData["Title"]</h2>
 
 <div class="container">
-    <div class="row form-group">
-        @using (Html.BeginForm("Index", "AccountManager", FormMethod.Get, new { id = "searchForm" }))
+    <div class="form-group">
+        @using (Html.BeginForm("Index", "AccountManager", FormMethod.Get, new {id = "searchForm"}))
         {
-            <div class="col-md-6 form-group">
+            <div class="form-group">
                 <label for="inputSearchUserName">Find by user name:</label>
-                <div class="input-group">
-                    @Html.TextBoxFor(m => m.AccountSearch.UserName, new {
-                        @class = "form-control", @id = "inputSearchUserName", @placeholder = "Search by user name" })
-                    <span class="input-group-btn">
-                        <input type="submit" value="Search" class="btn btn-default" />
-                    </span>
-                </div>
+
+                @Html.TextBoxFor(m => m.AccountSearch.UserName, new
+                {
+                    @class = "form-control", @id = "inputSearchUserName", @placeholder = "Search by user name"
+                })
             </div>
-        }
-        @using (Html.BeginForm("Index", "AccountManager", FormMethod.Get, new { id = "filterRoleForm" }))
-        {
-            <div class="col-md-6 form-group">
+
+            <div class="form-group">
                 <label for="filterByRole">Filter by role:</label>
-                <div class="input-group">
-                    @Html.DropDownListFor(m => m.AccountSearch.Role, Model.AvailableIdentityRoles.Select(item => new SelectListItem
-                    {Value = item.Name.ToString(),Text = item.Name.ToString(),}), "All Roles", new { @class = "form-control", @id = "filterByRole" })
-                    <span class="input-group-btn">
-                        <input type="submit" value="Filter" class="btn btn-default" />
-                    </span>
-                </div>
+
+                @Html.DropDownListFor(m => m.AccountSearch.Role, Model.AvailableIdentityRoles.Select(item => new SelectListItem
+                {Value = item.Name.ToString(), Text = item.Name.ToString(),}), "All Roles", new {@class = "form-control", @id = "filterByRole"})
+
             </div>
+            <button type="submit" class="btn btn-primary">Search</button>
         }
     </div>
+
     <div class="table-responsive">
         <table class="table">
             <tr>
@@ -110,11 +105,6 @@
         $(document).ready(function() {
             $(function() {
                 $('#messageModal').modal('show');
-            });
-            $("#searchForm").submit(function(e) {
-                if ($("#inputSearchUserName").val() == '') {
-                    e.preventDefault();
-                }
             });
         });
     </script>
