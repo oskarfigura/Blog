@@ -43,6 +43,8 @@ namespace Blog
                 .AddEntityFrameworkStores<BlogContext>()
                 .AddDefaultUI();
 
+            services.AddTransient<IUserRepo, UserRepo>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddAuthorization(options =>
