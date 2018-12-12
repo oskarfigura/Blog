@@ -28,17 +28,21 @@ namespace Blog.Models
 
         [Required]
         [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dddd, dd MMMM yyyy}")]
         [Display(Name = "Date Posted")]
         public DateTime PubDate { get; set; }
 
         [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dddd, dd MMMM yyyy}")]
         [Display(Name = "Date Edited")]
         public DateTime EditDate { get; set; }
 
         [Required]
         public string AuthorId { get; set; }
 
-        IList<Comment> Comments { get; set; } = new List<Comment>();
+        [Required]
+        public bool IsPublished { get; set; }
 
+        public IEnumerable<Comment> Comments { get; set; } = new List<Comment>();
     }
 }
