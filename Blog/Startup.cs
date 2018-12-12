@@ -7,7 +7,6 @@ using Blog.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -58,6 +57,7 @@ namespace Blog
                 options.AddPolicy("CanDeleteUsers", policy => policy.RequireClaim("CanDeleteUsers", "true"));
                 options.AddPolicy("CanChangeUserPermissions", policy => policy.RequireClaim("CanChangeUserPermissions", "true"));
                 options.AddPolicy("CanAccessAccountManager", policy => policy.RequireClaim("CanAccessAccountManager", "true"));
+                options.AddPolicy("CanAccessPostManager", policy => policy.RequireClaim("CanAccessPostManager", "true"));
             });
         }
 
