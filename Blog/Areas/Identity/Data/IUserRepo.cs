@@ -13,10 +13,9 @@ namespace Blog.Areas.Identity.Data
         Task<IEnumerable<IdentityRole>> GetAllRoles();
         Task<User> GetUserById(string userId);
         Task<User> GetUserByEmail(string email);
-//        Task<BlogUser> GetUserById(string userId);
-//        void InsertUser(BlogUser user);
-//        void DeleteUser(string userId);
-//        void UpdateUser(BlogUser user);
+        Task<bool> CheckIfEmailIsUnique(string email, string userId);
+        Task<bool> UpdateUser(User updatedUser);
+        //        void DeleteUser(string userId);
         void Save();
     }
 }

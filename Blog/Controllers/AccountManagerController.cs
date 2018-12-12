@@ -56,6 +56,62 @@ namespace Blog.Controllers
             });
         }
 
+        // GET: AccountManager/Edit, view for editing account details 
+        [Authorize(Policy = "CanEditUsers")]
+        public async Task<IActionResult> Edit(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return NotFound();
+            }
 
+            var user = await _userRepo.GetUserByEmail(email);
+            var availableRoles = await _userRepo.GetAllRoles();
+
+            if (string.IsNullOrEmpty(user.Email))
+            {
+                return NotFound();
+            }
+
+            return View(new AccountViewModel()
+            {
+                UserAccount = user,
+                AvailableIdentityRoles = availableRoles
+            });
+        }
+
+        // POST: AccountManager/Edit, process a change of account details
+        [Authorize(Policy = "CanEditUsers")]
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(AccountViewModel accountViewModel)
+        {
+            //Populate available list of roles after form post cleared the list
+            accountViewModel.AvailableIdentityRoles = await _userRepo.GetAllRoles();
+
+            if (accountViewModel.UserAccount != null)
+            {
+                var emailIsUnique = await _userRepo
+                    .CheckIfEmailIsUnique(accountViewModel.UserAccount.Email,
+                    accountViewModel.UserAccount.Id);
+
+                if (emailIsUnique)
+                {
+                    ViewData["EditResult"] = "User updated successfully!";
+                    var result = await _userRepo.UpdateUser(accountViewModel.UserAccount);
+                    if (!result)
+                    {
+                        ViewData["EditResult"] = "Please try again.";
+                    }
+
+                    return View(accountViewModel);
+                }
+
+                ViewData["EditResult"] = "Email already exists, please enter a different email.";
+                return View(accountViewModel);
+            }
+            ViewData["EditResult"] = "Please try again.";
+            return View(accountViewModel);
+        }
     }
 }
