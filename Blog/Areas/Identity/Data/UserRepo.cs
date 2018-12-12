@@ -71,13 +71,12 @@ namespace Blog.Areas.Identity.Data
                 var blogUser = await GetUserByEmailFromDb(email);
                 var role = await GetUsersRoleName(blogUser.Id);
                 user = GetAccountView(blogUser, role);
+                return user;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return user;
             }
-
-            return user;
         }
 
         
@@ -125,6 +124,8 @@ namespace Blog.Areas.Identity.Data
             this._disposed = true;
         }
 
+
+
         private static User GetAccountView(BlogUser blogUser, string role)
         {
             var user = new User()
@@ -143,6 +144,21 @@ namespace Blog.Areas.Identity.Data
             return user;
         }
 
+        private async Task<IEnumerable<User>> GetUsers()
+        {
+            var users = await GetBlogUsersFromDb();
+            var result = new List<User>();
+
+            foreach (var user in users)
+            {
+                var role = await GetUsersRoleName(user.Id);
+                result.Add(GetAccountView(user, role));
+            }
+
+            result = result.OrderBy(user => user.UserName).ToList();
+            return result;
+        }
+
         private async Task<IEnumerable<BlogUser>> GetBlogUsersFromDb()
         {
             return await _context.Users.ToListAsync();
@@ -156,20 +172,6 @@ namespace Blog.Areas.Identity.Data
         private async Task<BlogUser> GetUserByEmailFromDb(string userEmail)
         {
             return await _userManager.FindByEmailAsync(userEmail);
-        }
-        
-        private async Task<IEnumerable<User>> GetUsers()
-        {
-            var users = await GetBlogUsersFromDb();
-            var result = new List<User>();
-
-            foreach (var user in users)
-            {
-                var role = await GetUsersRoleName(user.Id);
-                result.Add(GetAccountView(user, role));
-            }
-
-            return result;
         }
 
         private async Task<string> GetUsersRoleName(string userId)

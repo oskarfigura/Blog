@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
@@ -7,6 +8,7 @@ using Blog.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace Blog.Controllers
@@ -33,12 +35,16 @@ namespace Blog.Controllers
             });
         }
 
+        // GET: AccountManager/Details, view with account details 
         public async Task<IActionResult> Details(string email)
         {
-            var user = await _userRepo.GetUserByEmail(email);
-            var availableRoles = await _userRepo.GetAllRoles();
+            if (string.IsNullOrEmpty(email))
+            {
+                return NotFound();
+            }
 
-            //TODO Add logic for handling exceptions and showing error messages
+            var user = await _userRepo.GetUserByEmail(email);
+
             if (string.IsNullOrEmpty(user.Email))
             {
                 return NotFound();
@@ -46,10 +52,10 @@ namespace Blog.Controllers
 
             return View(new AccountViewModel()
             {
-                UserAccount = user,
-                AvailableIdentityRoles = availableRoles
+                UserAccount = user
             });
         }
+
 
     }
 }

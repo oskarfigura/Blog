@@ -70,10 +70,11 @@ namespace Blog
             }
             else
             {
-                app.UseExceptionHandler("/Blog/Error");
+                app.UseExceptionHandler("/Shared/Error");
                 app.UseHsts();
             }
 
+            app.UseStatusCodePagesWithReExecute("/Shared/Error");
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
