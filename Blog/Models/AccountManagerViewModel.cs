@@ -11,7 +11,7 @@ namespace Blog.Models
      */
     public class AccountManagerViewModel
     {
-        public IEnumerable<AccountViewModel> Accounts { get; set; }
+        public IEnumerable<User> Accounts { get; set; }
         public IEnumerable<IdentityRole> AvailableIdentityRoles { get; set; }
         public AccountSearch AccountSearch { get; set; }
     }

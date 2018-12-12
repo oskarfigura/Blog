@@ -9,8 +9,10 @@ namespace Blog.Areas.Identity.Data
 {
     public interface IUserRepo : IDisposable
     {
-        Task<IEnumerable<AccountViewModel>> GetUsersBySearchData(AccountSearch searchModel);
+        Task<IEnumerable<User>> GetUsersBySearchData(AccountSearch searchModel);
         Task<IEnumerable<IdentityRole>> GetAllRoles();
+        Task<User> GetUserById(string userId);
+        Task<User> GetUserByEmail(string email);
 //        Task<BlogUser> GetUserById(string userId);
 //        void InsertUser(BlogUser user);
 //        void DeleteUser(string userId);

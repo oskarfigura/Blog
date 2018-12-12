@@ -70,9 +70,9 @@
                         @Html.DisplayFor(modelItem => user.Role)
                     </td>
                     <td>
-                        @Html.ActionLink("Edit", "Edit", new {id = user.Id}) |
-                        @Html.ActionLink("Details", "Details", new {id = user.Id}) |
-                        @Html.ActionLink("Delete", "Delete", new {id = user.Id})
+                        @Html.ActionLink("Edit", "Edit", new {email = user.Email}) |
+                        @Html.ActionLink("Details", "Details", new { email = user.Email}) |
+                        @Html.ActionLink("Delete", "Delete", new { email = user.Email})
                     </td>
                 </tr>
             }

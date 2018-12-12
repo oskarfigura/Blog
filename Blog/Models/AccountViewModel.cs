@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blog.Areas.Identity.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace Blog.Models
 {
-    /**
-     * Used for displaying account data including the role
-     */
-    public class AccountViewModel : BlogUser
+    public class AccountViewModel
     {
-        public string Role { get; set; }
+        public User UserAccount { get; set; }
+        public IEnumerable<IdentityRole> AvailableIdentityRoles { get; set; }
     }
 }

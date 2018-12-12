@@ -1,7 +1,72 @@
-﻿
+﻿@model AccountViewModel
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Account Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Details</h2>
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
 
+<div class="container">
+    <div class="row">
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.UserAccount.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UserAccount.Name)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.UserAccount.DisplayName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UserAccount.DisplayName)
+            </dd>
+
+            <dt>
+                User Name
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UserAccount.UserName)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.UserAccount.Email)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UserAccount.Email)
+            </dd>
+
+            <dt>
+                Email Confirmed
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UserAccount.EmailConfirmed)
+            </dd>
+
+            <dt>
+                Phone Number
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UserAccount.PhoneNumber)
+            </dd>
+
+            <dt>
+                Phone No. Confirmed
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UserAccount.PhoneNumberConfirmed)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.UserAccount.Role)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.UserAccount.Role)
+            </dd>
+        </dl>
+    </div>
+    @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-default" })
+    @Html.ActionLink("Edit", "Edit", new { email = Model.UserAccount.Email }, new { @class = "btn btn-primary" })
+</div>
