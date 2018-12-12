@@ -36,16 +36,16 @@ namespace Blog.Controllers
         }
 
         // GET: AccountManager/Details, view with account details 
-        public async Task<IActionResult> Details(string email)
+        public async Task<IActionResult> Details(string userName)
         {
-            if (string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(userName))
             {
                 return NotFound();
             }
 
-            var user = await _userRepo.GetUserByEmail(email);
+            var user = await _userRepo.GetUserByUserName(userName);
 
-            if (string.IsNullOrEmpty(user.Email))
+            if (string.IsNullOrEmpty(user.UserName))
             {
                 return NotFound();
             }
@@ -58,17 +58,17 @@ namespace Blog.Controllers
 
         // GET: AccountManager/Edit, view for editing account details 
         [Authorize(Policy = "CanEditUsers")]
-        public async Task<IActionResult> Edit(string email)
+        public async Task<IActionResult> Edit(string userName)
         {
-            if (string.IsNullOrEmpty(email))
+            if (string.IsNullOrEmpty(userName))
             {
                 return NotFound();
             }
 
-            var user = await _userRepo.GetUserByEmail(email);
+            var user = await _userRepo.GetUserByUserName(userName);
             var availableRoles = await _userRepo.GetAllRoles();
 
-            if (string.IsNullOrEmpty(user.Email))
+            if (string.IsNullOrEmpty(user.UserName))
             {
                 return NotFound();
             }
@@ -113,5 +113,29 @@ namespace Blog.Controllers
             ViewData["EditResult"] = "Please try again.";
             return View(accountViewModel);
         }
+
+        // GET: AccountManager/Delete, Display delete account view
+        [Authorize(Policy = "CanDeleteUsers")]
+        public async Task<IActionResult> Delete(string userName)
+        {
+            if (string.IsNullOrEmpty(userName))
+            {
+                return NotFound();
+            }
+
+            var user = await _userRepo.GetUserByUserName(userName);
+
+            if (string.IsNullOrEmpty(user.UserName))
+            {
+                return NotFound();
+            }
+
+            AccountDeleteViewModel deleteViewModel = new AccountDeleteViewModel
+            {
+                UserName = user.UserName
+            };
+            return View(deleteViewModel);
+        }
+
     }
 }
