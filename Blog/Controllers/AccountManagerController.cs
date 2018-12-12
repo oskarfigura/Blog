@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
 using Blog.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.EntityFrameworkCore.ValueGeneration.Internal;
 
 namespace Blog.Controllers
 {
@@ -27,7 +20,13 @@ namespace Blog.Controllers
         {
             var accountSearchData = accountManagerViewModel.AccountSearch;
 
-            return View(new AccountManagerViewModel()
+            //Get any result messages from CRUD operations on accounts
+            if (TempData["operationResult"] != null)
+            {
+                ViewData["ManagerMessage"] = TempData["operationResult"].ToString();
+            }
+
+            return View(new AccountManagerViewModel
             {
                 Accounts = await _userRepo.GetUsersBySearchData(accountManagerViewModel.AccountSearch),
                 AvailableIdentityRoles = await _userRepo.GetAllRoles(),
@@ -50,7 +49,7 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            return View(new AccountViewModel()
+            return View(new AccountViewModel
             {
                 UserAccount = user
             });
@@ -73,7 +72,7 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            return View(new AccountViewModel()
+            return View(new AccountViewModel
             {
                 UserAccount = user,
                 AvailableIdentityRoles = availableRoles
@@ -130,12 +129,28 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            AccountDeleteViewModel deleteViewModel = new AccountDeleteViewModel
+            return View(new AccountDeleteViewModel
             {
                 UserName = user.UserName
-            };
-            return View(deleteViewModel);
+            });
         }
 
+        // POST: AccountManager/Delete, process deleting account
+        [Authorize(Policy = "CanDeleteUsers")]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(AccountDeleteViewModel deleteViewModel)
+        {
+            var deleteResult = await _userRepo.DeleteUser(deleteViewModel.UserName);
+
+            if (deleteResult)
+            {
+                TempData["operationResult"] = "User deleted successfully.";
+                return RedirectToAction("Index");
+            }
+
+            ViewData["DeleteResult"] = "Unexpected error occurred! Please try again.";
+            return View(deleteViewModel);
+        }
     }
 }

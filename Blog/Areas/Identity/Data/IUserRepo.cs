@@ -15,7 +15,6 @@ namespace Blog.Areas.Identity.Data
         Task<User> GetUserByUserName(string userName);
         Task<bool> CheckIfEmailIsUnique(string email, string userId);
         Task<bool> UpdateUser(User updatedUser);
-        //        void DeleteUser(string userId);
-        void Save();
+        Task<bool> DeleteUser(string userName);
     }
 }

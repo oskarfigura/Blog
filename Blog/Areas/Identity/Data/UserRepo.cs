@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Blog.Areas.Identity.Data
 {
-    public class UserRepo : IUserRepo, IDisposable
+    public class UserRepo : IUserRepo
     {
         private readonly BlogContext _context;
         private readonly UserManager<BlogUser> _userManager;
@@ -119,11 +119,17 @@ namespace Blog.Areas.Identity.Data
             return user.Id == userId;
         }
 
-        //        public async void DeleteUser(string userId)
-        //        {
-        //            var user = await _userManager.FindByIdAsync(userId);
-        //            await _userManager.DeleteAsync(user);
-        //        }
+        /**
+         * Delete user from db
+         */
+        public async Task<bool> DeleteUser(string userName)
+        {
+            if (string.IsNullOrEmpty(userName)) return false;
+
+            var user = await GetUserByUserNameFromDb(userName);
+            var result = await _userManager.DeleteAsync(user);
+            return result.Succeeded;
+        }
 
         public async void Save()
         {

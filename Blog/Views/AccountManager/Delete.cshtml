@@ -1,9 +1,4 @@
 ﻿@model AccountDeleteViewModel
-
-@{
-    ViewBag.Title = "Delete";
-}
-
 @{
     ViewData["Title"] = "Delete Account";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -14,21 +9,12 @@
     {
         @Html.AntiForgeryToken()
         {
-
             <div class="form-horizontal">
                 <h3>Delete account: @Html.DisplayFor(model => model.UserName)</h3>
                 <hr />
-                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                 @Html.HiddenFor(model => model.UserName)
                 <div class="form-group">
-                    <label class="control-label col-md-3">Enter password to confirm:</label>
-                    <div class="col-md-9">
-                        @Html.EditorFor(model => model.Password, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-md-offset-3 col-md-10">
+                    <div class="col-md-12">
                         @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-default" })
                         <input type="submit" value="Delete" class="btn btn-danger" />
                     </div>
@@ -36,7 +22,7 @@
             </div>
         }
     }
-    @if (ViewBag.DeleteResult != null)
+    @if (ViewData["DeleteResult"] != null)
     {
         <!-- Modal -->
         <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModal" aria-hidden="true">
@@ -46,7 +32,7 @@
                         <h2 class="modal-title">Message:</h2>
                     </div>
                     <div class="modal-body">
-                        <h3>@ViewBag.DeleteResult</h3>
+                        <h3>@ViewData["DeleteResult"]</h3>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
@@ -57,7 +43,6 @@
     }
 </div>
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
             $(function () {
@@ -66,6 +51,3 @@
         });
     </script>
 }
-
-
-
