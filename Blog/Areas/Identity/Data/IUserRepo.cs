@@ -12,7 +12,7 @@ namespace Blog.Areas.Identity.Data
         Task<IEnumerable<User>> GetUsersBySearchData(AccountSearch searchModel);
         Task<IEnumerable<IdentityRole>> GetAllRoles();
         Task<User> GetUserById(string userId);
-        Task<User> GetUserByEmail(string email);
+        Task<User> GetUserByUserName(string userName);
         Task<bool> CheckIfEmailIsUnique(string email, string userId);
         Task<bool> UpdateUser(User updatedUser);
         //        void DeleteUser(string userId);

@@ -66,25 +66,23 @@ namespace Blog.Areas.Identity.Data
             var role = await GetUsersRoleName(userId);
 
             user = GetAccountView(blogUser, role);
-            user.SecurityStamp = blogUser.SecurityStamp;
             return user;
         }
 
         /**
-         * Find user using an email address
+         * Find user by user name
          */
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<User> GetUserByUserName(string userName)
         {
             var user = new User();
 
-            if (string.IsNullOrEmpty(email)) return user;
+            if (string.IsNullOrEmpty(userName)) return user;
 
             try
             {
-                var blogUser = await GetUserByEmailFromDb(email);
+                var blogUser = await GetUserByUserNameFromDb(userName);
                 var role = await GetUsersRoleName(blogUser.Id);
                 user = GetAccountView(blogUser, role);
-                user.SecurityStamp = blogUser.SecurityStamp;
                 return user;
             }
             catch (Exception)
@@ -116,7 +114,7 @@ namespace Blog.Areas.Identity.Data
             var user = await GetUserByEmail(email);
 
             if (user == null || string.IsNullOrEmpty(user.Email)) return true;
-            
+
             //Check if found email belongs to the user
             return user.Id == userId;
         }
@@ -126,7 +124,7 @@ namespace Blog.Areas.Identity.Data
         //            var user = await _userManager.FindByIdAsync(userId);
         //            await _userManager.DeleteAsync(user);
         //        }
-  
+
         public async void Save()
         {
             await _context.SaveChangesAsync();
@@ -243,6 +241,28 @@ namespace Blog.Areas.Identity.Data
         }
 
         /**
+         * Find user by email
+         */
+        private async Task<User> GetUserByEmail(string email)
+        {
+            var user = new User();
+
+            if (string.IsNullOrEmpty(email)) return user;
+
+            try
+            {
+                var blogUser = await GetUserByEmailFromDb(email);
+                var role = await GetUsersRoleName(blogUser.Id);
+                user = GetAccountView(blogUser, role);
+                return user;
+            }
+            catch (Exception)
+            {
+                return user;
+            }
+        }
+
+        /**
          * Returns a list of all users from the database
          */
         private async Task<IEnumerable<BlogUser>> GetBlogUsersFromDb()
@@ -264,6 +284,14 @@ namespace Blog.Areas.Identity.Data
         private async Task<BlogUser> GetUserByEmailFromDb(string userEmail)
         {
             return await _userManager.FindByEmailAsync(userEmail);
+        }
+
+        /**
+         * Returns a user with the specified user name
+         */
+        private async Task<BlogUser> GetUserByUserNameFromDb(string userName)
+        {
+            return await _context.Users.Where(x => x.UserName.Equals(userName)).FirstAsync();
         }
 
         /**
