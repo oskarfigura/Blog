@@ -9,6 +9,11 @@ namespace Blog.Controllers
     [Authorize(Policy = "CanAccessAccountManager")]
     public class AccountManagerController : Controller
     {
+        private const string TempDataOperationParam = "UserOperationResult";
+        private const string ViewDataManagerMsgParam = "ManagerMessage";
+        private const string ViewDataEditResult = "EditResult";
+        private const string ViewDataDeleteResult = "DeleteResult";
+
         private readonly IUserRepo _userRepo;
 
         public AccountManagerController(IUserRepo userRepo)
@@ -21,9 +26,9 @@ namespace Blog.Controllers
             var accountSearchData = accountManagerViewModel.AccountSearch;
 
             //Get any result messages from CRUD operations on accounts
-            if (TempData["operationResult"] != null)
+            if (TempData[TempDataOperationParam] != null)
             {
-                ViewData["ManagerMessage"] = TempData["operationResult"].ToString();
+                ViewData[ViewDataManagerMsgParam] = TempData[TempDataOperationParam].ToString();
             }
 
             return View(new AccountManagerViewModel
@@ -96,20 +101,20 @@ namespace Blog.Controllers
 
                 if (emailIsUnique)
                 {
-                    ViewData["EditResult"] = "User updated successfully!";
+                    ViewData[ViewDataEditResult] = "User updated successfully!";
                     var result = await _userRepo.UpdateUser(accountViewModel.UserAccount);
                     if (!result)
                     {
-                        ViewData["EditResult"] = "Please try again.";
+                        ViewData[ViewDataEditResult] = "Please try again.";
                     }
 
                     return View(accountViewModel);
                 }
 
-                ViewData["EditResult"] = "Email already exists, please enter a different email.";
+                ViewData[ViewDataEditResult] = "Email already exists, please enter a different email.";
                 return View(accountViewModel);
             }
-            ViewData["EditResult"] = "Please try again.";
+            ViewData[ViewDataEditResult] = "Please try again.";
             return View(accountViewModel);
         }
 
@@ -145,11 +150,11 @@ namespace Blog.Controllers
 
             if (deleteResult)
             {
-                TempData["operationResult"] = "User deleted successfully.";
+                TempData[TempDataOperationParam] = "User deleted successfully.";
                 return RedirectToAction("Index");
             }
 
-            ViewData["DeleteResult"] = "Unexpected error occurred! Please try again.";
+            ViewData[ViewDataDeleteResult] = "Unexpected error occurred! Please try again.";
             return View(deleteViewModel);
         }
     }
