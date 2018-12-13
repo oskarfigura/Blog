@@ -1,7 +1,59 @@
-﻿
+﻿@model PostManagerViewModel
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Post Manager";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<h2>@ViewData["Title"]</h2>
 
+@if (!Model.BlogPosts.Any())
+{
+    <h4>There are currently no posts.</h4>
+}
+
+<button type="button" onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
+        class="btn btn-success">
+    Create New Post
+</button>
+
+@if (Model.BlogPosts.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.BlogPosts.First().Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.BlogPosts.First().AuthorUserName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.BlogPosts.First().IsPublished)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.BlogPosts)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AuthorUserName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsPublished)
+                    </td>
+                    <td>
+                        <a asp-action="ViewPost" asp-route-id="@item.Slug">View</a> |
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
