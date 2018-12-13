@@ -12,31 +12,30 @@ namespace Blog.Areas.Identity.Data
 {
     public class DbInitializer
     {
-        public static readonly string[] adminUsers = { "Member1" };
+        public static readonly string[] AdminUsers = { "Member1" };
 
-        public static readonly string[] editorUsers = { };
+        public static readonly string[] EditorUsers = { };
 
-        public static readonly string[] followerUsers = { "Customer1", "Customer2",
+        public static readonly string[] FollowerUsers = { "Customer1", "Customer2",
             "Customer3", "Customer4", "Customer5" };
 
-        private const string defaultPassword = "Password123!";
-        private const string defaultEmail = "@email.com";
+        private const string DefaultPassword = "Password123!";
+        private const string DefaultEmail = "@email.com";
 
-        private const string adminRole = "Admin";
-        private const string editorRole = "Editor";
-        private const string followerRole = "Follower";
+        private const string AdminRole = "Admin";
+        private const string EditorRole = "Editor";
+        private const string FollowerRole = "Follower";
 
-        private const string creatingCommentsClaim = "CanComment";
-        private const string deletingCommentsClaim = "CanDeleteComments";
-        private const string accessingAccountManagerClaim = "CanAccessAccountManager";
-        private const string accessingPostManagerClaim = "CanAccessPostManager";
-        private const string editingUsersClaim = "CanEditUsers";
-        private const string deletingUsersClaim = "CanDeleteUsers";
-        private const string changingUserPermissionsClaim = "CanChangeUserPermissions";
-        private const string editingPostsClaim = "CanEditUsers";
-        private const string creatingPostsClaim = "CanCreatePosts";
-        private const string deletingPostsClaim = "CanDeletePosts";
-
+        private const string CreatingCommentsClaim = "CanComment";
+        private const string DeletingCommentsClaim = "CanDeleteComments";
+        private const string AccessingAccountManagerClaim = "CanAccessAccountManager";
+        private const string AccessingPostManagerClaim = "CanAccessPostManager";
+        private const string EditingUsersClaim = "CanEditUsers";
+        private const string DeletingUsersClaim = "CanDeleteUsers";
+        private const string ChangingUserPermissionsClaim = "CanChangeUserPermissions";
+        private const string EditingPostsClaim = "CanEditUsers";
+        private const string CreatingPostsClaim = "CanCreatePosts";
+        private const string DeletingPostsClaim = "CanDeletePosts";
 
         //Seed database with default data 
         public async Task SeedDb(IServiceProvider serviceProvider, IConfiguration configuration)
@@ -51,7 +50,7 @@ namespace Blog.Areas.Identity.Data
         //Seed database with roles
         private async Task SeedRoles(RoleManager<IdentityRole> roleManager)
         {
-            string[] roleNames = { adminRole, editorRole, followerRole };
+            string[] roleNames = { AdminRole, EditorRole, FollowerRole };
 
             foreach (var roleName in roleNames)
             {
@@ -66,7 +65,10 @@ namespace Blog.Areas.Identity.Data
                     };
 
                     var roleResult = await roleManager.CreateAsync(role);
-                    await SeedRoleClaims(roleManager, role);
+                    if (roleResult.Succeeded)
+                    {
+                        await SeedRoleClaims(roleManager, role);
+                    }
                 }
             }
         }
@@ -76,25 +78,25 @@ namespace Blog.Areas.Identity.Data
         {
             var roleName = role.Name;
 
-            if (roleName.Equals(adminRole))
+            if (roleName.Equals(AdminRole))
             {
-                string[] claims = { creatingCommentsClaim, deletingCommentsClaim, editingPostsClaim,
-                                    creatingPostsClaim, deletingPostsClaim, editingUsersClaim, accessingPostManagerClaim,
-                                     deletingUsersClaim, accessingAccountManagerClaim, changingUserPermissionsClaim };
+                string[] claims = { CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
+                                    CreatingPostsClaim, DeletingPostsClaim, EditingUsersClaim, AccessingPostManagerClaim,
+                                     DeletingUsersClaim, AccessingAccountManagerClaim, ChangingUserPermissionsClaim };
 
                 await AddClaimsToRole(claims, roleManager, role);
             }
-            else if (roleName.Equals(editorRole))
+            else if (roleName.Equals(EditorRole))
             {
-                string[] claims = { creatingCommentsClaim, deletingCommentsClaim, editingPostsClaim,
-                                    creatingPostsClaim, deletingPostsClaim, editingUsersClaim, deletingUsersClaim,
-                                    accessingAccountManagerClaim, changingUserPermissionsClaim, accessingPostManagerClaim };
+                string[] claims = { CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
+                                    CreatingPostsClaim, DeletingPostsClaim, EditingUsersClaim, DeletingUsersClaim,
+                                    AccessingAccountManagerClaim, ChangingUserPermissionsClaim, AccessingPostManagerClaim };
 
                 await AddClaimsToRole(claims, roleManager, role);
             }
-            else if (roleName.Equals(followerRole))
+            else if (roleName.Equals(FollowerRole))
             {
-                string[] claims = { creatingCommentsClaim };
+                string[] claims = { CreatingCommentsClaim };
                 await AddClaimsToRole(claims, roleManager, role);
             }
         }
@@ -116,12 +118,12 @@ namespace Blog.Areas.Identity.Data
         //Seeds the db with users
         private async Task SeedUsers(UserManager<BlogUser> userManager)
         {
-            string[] defaultUsers = adminUsers.Concat(editorUsers).Concat(followerUsers).ToArray();
+            string[] defaultUsers = AdminUsers.Concat(EditorUsers).Concat(FollowerUsers).ToArray();
 
             //Create users and seed to database
             foreach (var username in defaultUsers)
             {
-                var blogUser = await userManager.FindByEmailAsync(username + defaultEmail);
+                var blogUser = await userManager.FindByEmailAsync(username + DefaultEmail);
 
                 //Check if this user already exists
                 if (blogUser == null)
@@ -130,11 +132,11 @@ namespace Blog.Areas.Identity.Data
                     {
                         Name = username,
                         DisplayName = username,
-                        UserName = username + defaultEmail,
-                        Email = username + defaultEmail
+                        UserName = username + DefaultEmail,
+                        Email = username + DefaultEmail
                     };
 
-                    var result = await userManager.CreateAsync(newUser, defaultPassword);
+                    var result = await userManager.CreateAsync(newUser, DefaultPassword);
 
                     //Add roles and claims to users
                     if (result.Succeeded)
@@ -150,17 +152,17 @@ namespace Blog.Areas.Identity.Data
         {
             var username = newUser.UserName;
 
-            if (adminUsers.Any(x => (x + defaultEmail).Contains(username)))
+            if (AdminUsers.Any(x => (x + DefaultEmail).Contains(username)))
             {
-                await userManager.AddToRoleAsync(newUser, adminRole);
+                await userManager.AddToRoleAsync(newUser, AdminRole);
             }
-            else if (editorUsers.Any(x => (x + defaultEmail).Contains(username)))
+            else if (EditorUsers.Any(x => (x + DefaultEmail).Contains(username)))
             {
-                await userManager.AddToRoleAsync(newUser, editorRole);
+                await userManager.AddToRoleAsync(newUser, EditorRole);
             }
-            else if (followerUsers.Any(x => (x + defaultEmail).Contains(username)))
+            else if (FollowerUsers.Any(x => (x + DefaultEmail).Contains(username)))
             {
-                await userManager.AddToRoleAsync(newUser, followerRole);
+                await userManager.AddToRoleAsync(newUser, FollowerRole);
             }
         }
 
