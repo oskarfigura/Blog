@@ -36,9 +36,9 @@
                     {
                         <li><a asp-area="" asp-controller="AccountManager" asp-action="Index">Account Manager</a></li>
                     }
-                    @if ((await AuthorizationService.AuthorizeAsync(User, "CanCreatePosts")).Succeeded)
+                    @if ((await AuthorizationService.AuthorizeAsync(User, "CanAccessPostManager")).Succeeded)
                     {
-                        <li><a asp-area="" asp-controller="Blog" asp-action="Create">Create Post</a></li>
+                        <li><a asp-area="" asp-controller="PostManager" asp-action="Index">Post Manager</a></li>
                     }
                 </ul>
                 <partial name="_LoginPartial" />

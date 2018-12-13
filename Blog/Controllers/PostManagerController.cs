@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
 using Blog.Models;
@@ -20,10 +21,12 @@ namespace Blog.Controllers
         private const string MsgSomethingIsWrong = "Something went wrong. Please try again.";
 
         private readonly IPostRepo _postRepo;
+        private readonly IUserRepo _userRepo;
 
-        public PostManagerController(IPostRepo postRepo)
+        public PostManagerController(IPostRepo postRepo, IUserRepo userRepo)
         {
             _postRepo = postRepo;
+            _userRepo = userRepo;
         }
 
         public async Task<IActionResult> Index(PostManagerViewModel postManagerView)
@@ -38,9 +41,20 @@ namespace Blog.Controllers
 
             return View(new PostManagerViewModel
             {
-                BlogPosts = await _postRepo.GetAllPosts(),
+                BlogPosts = await _postRepo.GetPostsBySearchData(postSearchData),
                 SearchTitle = postSearchData
             });
+        }
+
+        // GET: PostManager/ViewPost, redirect to post view
+        public IActionResult ViewPost(string slug)
+        {
+            if (string.IsNullOrEmpty(slug))
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction("Post", "Blog", new {slug});
         }
 
         // GET: PostManager/AddPost, view for adding a new post
@@ -56,9 +70,12 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPost(PostCreateViewModel createPostViewModel)
         {
-            var result = await _postRepo.AddPost(createPostViewModel);
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepo.GetUserById(currentUserId);
 
-            if (result.Succeeded)
+            var result = await _postRepo.AddPost(createPostViewModel, user);
+
+            if (result)
             {
                 TempData[TempDataOperationParam] = "Post created successfully!";
                 return RedirectToAction("Index");
@@ -123,8 +140,6 @@ namespace Blog.Controllers
             return View(postEditViewModel);
         }
 
-
-
         // GET: PostManager/Delete, Display delete post view
         [Authorize(Policy = "CanDeletePosts")]
         public async Task<IActionResult> Delete(string postId)
@@ -165,6 +180,5 @@ namespace Blog.Controllers
             ViewData[ViewDataDeletePostResult] = "Unexpected error occurred! Please try again.";
             return View(deleteViewModel);
         }
-
     }
 }
