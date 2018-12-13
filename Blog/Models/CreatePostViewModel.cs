@@ -11,13 +11,13 @@ namespace Blog.Models
         [Required]
         [DataType(DataType.Text)]
         [StringLength(60, MinimumLength = 3,
-            ErrorMessage = "A title must be between 3 and 60 characters long!")]
+            ErrorMessage = "Post title must be between 3 and 60 characters long!")]
         public string Title { get; set; }
 
         [Required]
         [DataType(DataType.Text)]
         [StringLength(60, MinimumLength = 3,
-            ErrorMessage = "Slug must be between 3 and 60 characters long!")]
+            ErrorMessage = "Post slug must be between 3 and 60 characters long!")]
         public string Slug { get; set; }
 
         [Required]
