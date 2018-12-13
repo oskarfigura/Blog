@@ -12,7 +12,7 @@ namespace Blog.Models
 
         [Required]
         [Display(Name = "Slug Url")]
-        public string SlugUrl { get; set; }
+        public string Slug { get; set; }
 
         [Required]
         [DataType(DataType.Text)]
