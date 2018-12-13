@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
 using Blog.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -146,6 +147,15 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(AccountDeleteViewModel deleteViewModel)
         {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepo.GetUserById(currentUserId);
+
+            if (deleteViewModel.UserName.Equals(user.UserName))
+            {
+                ViewData[ViewDataDeleteResult] = "You cannot delete yourself from account manager! Please do it in profile settings.";
+                return View(deleteViewModel);
+            }
+
             var deleteResult = await _userRepo.DeleteUser(deleteViewModel.UserName);
 
             if (deleteResult)
