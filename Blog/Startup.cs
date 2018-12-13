@@ -43,6 +43,7 @@ namespace Blog
                 .AddDefaultUI();
 
             services.AddTransient<IUserRepo, UserRepo>();
+            services.AddTransient<IPostRepo, PostRepo>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
