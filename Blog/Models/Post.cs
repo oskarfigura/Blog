@@ -41,6 +41,11 @@ namespace Blog.Models
         public string AuthorId { get; set; }
 
         [Required]
+        [Display(Name = "Author")]
+        public string AuthorUserName { get; set; }
+
+        [Required]
+        [Display(Name = "Published")]
         public bool IsPublished { get; set; }
 
         public IEnumerable<Comment> Comments { get; set; } = new List<Comment>();
