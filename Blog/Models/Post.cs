@@ -16,24 +16,20 @@ namespace Blog.Models
 
         [Required]
         [DataType(DataType.Text)]
-        [StringLength(60, MinimumLength = 3,
-        ErrorMessage = "A title must be between 3 and 60 characters long!")]
         public string Title { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        [StringLength(1000, MinimumLength = 3,
-        ErrorMessage = "Post must be between 3 and 1000 characters long!")]
+        [DataType(DataType.Html)]
         public string Content { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dddd, dd MMMM yyyy}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM-dd-yyyy hh:mm tt}")]
         [Display(Name = "Date Posted")]
         public DateTime PubDate { get; set; }
 
         [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dddd, dd MMMM yyyy}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM-dd-yyyy hh:mm tt}")]
         [Display(Name = "Date Edited")]
         public DateTime EditDate { get; set; }
 
