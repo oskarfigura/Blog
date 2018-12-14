@@ -12,12 +12,15 @@ namespace Blog.Areas.Identity.Data
 {
     public class DbInitializer
     {
-        public static readonly string[] AdminUsers = { "Member1" };
+        public static readonly string[] AdminUsers = {"Member1"};
 
         public static readonly string[] EditorUsers = { };
 
-        public static readonly string[] FollowerUsers = { "Customer1", "Customer2",
-            "Customer3", "Customer4", "Customer5" };
+        public static readonly string[] FollowerUsers =
+        {
+            "Customer1", "Customer2",
+            "Customer3", "Customer4", "Customer5"
+        };
 
         private const string DefaultPassword = "Password123!";
         private const string DefaultEmail = "@email.com";
@@ -33,7 +36,7 @@ namespace Blog.Areas.Identity.Data
         private const string EditingUsersClaim = "CanEditUsers";
         private const string DeletingUsersClaim = "CanDeleteUsers";
         private const string ChangingUserPermissionsClaim = "CanChangeUserPermissions";
-        private const string EditingPostsClaim = "CanEditUsers";
+        private const string EditingPostsClaim = "CanEditPosts";
         private const string CreatingPostsClaim = "CanCreatePosts";
         private const string DeletingPostsClaim = "CanDeletePosts";
 
@@ -50,7 +53,7 @@ namespace Blog.Areas.Identity.Data
         //Seed database with roles
         private async Task SeedRoles(RoleManager<IdentityRole> roleManager)
         {
-            string[] roleNames = { AdminRole, EditorRole, FollowerRole };
+            string[] roleNames = {AdminRole, EditorRole, FollowerRole};
 
             foreach (var roleName in roleNames)
             {
@@ -80,23 +83,28 @@ namespace Blog.Areas.Identity.Data
 
             if (roleName.Equals(AdminRole))
             {
-                string[] claims = { CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
-                                    CreatingPostsClaim, DeletingPostsClaim, EditingUsersClaim, AccessingPostManagerClaim,
-                                     DeletingUsersClaim, AccessingAccountManagerClaim, ChangingUserPermissionsClaim };
+                string[] claims =
+                {
+                    CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
+                    CreatingPostsClaim, DeletingPostsClaim, EditingUsersClaim, AccessingPostManagerClaim,
+                    DeletingUsersClaim, AccessingAccountManagerClaim, ChangingUserPermissionsClaim
+                };
 
                 await AddClaimsToRole(claims, roleManager, role);
             }
             else if (roleName.Equals(EditorRole))
             {
-                string[] claims = { CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
-                                    CreatingPostsClaim, DeletingPostsClaim, EditingUsersClaim, DeletingUsersClaim,
-                                    AccessingAccountManagerClaim, ChangingUserPermissionsClaim, AccessingPostManagerClaim };
+                string[] claims =
+                {
+                    CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
+                    CreatingPostsClaim, DeletingPostsClaim, AccessingPostManagerClaim
+                };
 
                 await AddClaimsToRole(claims, roleManager, role);
             }
             else if (roleName.Equals(FollowerRole))
             {
-                string[] claims = { CreatingCommentsClaim };
+                string[] claims = {CreatingCommentsClaim};
                 await AddClaimsToRole(claims, roleManager, role);
             }
         }
