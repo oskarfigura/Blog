@@ -7,6 +7,8 @@
   <ItemGroup>
     <Compile Remove="Migrations\20181208175849_CreateIdentitySchema.cs" />
     <Compile Remove="Migrations\20181208175849_CreateIdentitySchema.Designer.cs" />
+    <Compile Remove="Migrations\20181214220842_updatedPostDateFormat.cs" />
+    <Compile Remove="Migrations\20181214220842_updatedPostDateFormat.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
