@@ -99,7 +99,7 @@ namespace Blog.Areas.Identity.Data
                 post.Title = postEditViewModel.Title;
                 post.Content = postEditViewModel.Content;
                 post.Slug = postEditViewModel.Slug;
-                post.EditDate = DateTime.Today;
+                post.EditDate = DateTime.Now;
 
                 _context.Posts.Update(post);
                 Save();
@@ -111,12 +111,26 @@ namespace Blog.Areas.Identity.Data
             }
         }
 
+        /**
+         * Used for checking if slug is unique when editing a post
+         */
         public async Task<bool> CheckIfSlugIsUnique(string slug, string postId)
         {
             var postContainingSlug = await _context.Posts
                 .Where(p => p.Slug.Equals(slug)
                             && !p.Id.Equals(postId)).ToListAsync();
-            return postContainingSlug == null;
+            return postContainingSlug.Count == 0;
+        }
+
+        /**
+         * Used for checking if slug is unique for new posts that do not have id
+         */
+        public async Task<bool> CheckIfSlugIsUnique(string slug)
+        {
+            var postContainingSlug = await _context.Posts
+                .Where(p => p.Slug.Equals(slug)).ToListAsync();
+
+            return postContainingSlug.Count == 0;
         }
 
         public async void Save()
@@ -154,9 +168,9 @@ namespace Blog.Areas.Identity.Data
                 Content = post.Content,
                 Slug = post.Slug,
                 IsPublished = post.Publish,
-                PubDate = DateTime.Today,
+                PubDate = DateTime.Now,
                 AuthorUserName = author.UserName,
-                AuthorId = author.Role
+                AuthorId = author.Id
             };
         }
     }
