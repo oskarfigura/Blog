@@ -6,7 +6,7 @@
 }
 
 <h2>@ViewData["Title"]</h2>
-
+<hr />
 @if (!Model.BlogPosts.Any())
 {
     <h4>There are currently no posts.</h4>
@@ -48,12 +48,43 @@
                         @Html.DisplayFor(modelItem => item.IsPublished)
                     </td>
                     <td>
-                        <a asp-action="ViewPost" asp-route-id="@item.Slug">View</a> |
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        @Html.ActionLink("View", "ViewPost", new {slug = @item.Slug }) |
+                        @Html.ActionLink("Edit", "Edit", new { postId = @item.Id }) |
+                        @Html.ActionLink("Delete", "Delete", new { postId = @item.Id })
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+}
+
+@if (ViewData["PostManagerMessage"] != null)
+{
+    <!-- Modal -->
+    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">Message:</h2>
+                </div>
+                <div class="modal-body">
+                    <h3>@ViewData["PostManagerMessage"]</h3>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts
+    {
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                $('#messageModal').modal('show');
+            });
+        });
+    </script>
 }
