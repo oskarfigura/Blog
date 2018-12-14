@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
 using Blog.Models;
@@ -70,9 +73,27 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPost(PostCreateViewModel createPostViewModel)
         {
+            var slug = CreateSlug(createPostViewModel.Slug);
+
+            if (string.IsNullOrEmpty(slug))
+            {
+                ViewData[ViewDataEditPostResult] =
+                    "Slug contains reserved characters, please only use letters and spaces.";
+                return View(createPostViewModel);
+            }
+
+            var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(slug);
+
+            if (!slugIsUnique)
+            {
+                ViewData[ViewDataAddPostResult] = "Slug already exists, please enter a different slug.";
+                return View(createPostViewModel);
+            }
+
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var user = await _userRepo.GetUserById(currentUserId);
 
+            createPostViewModel.Slug = slug;
             var result = await _postRepo.AddPost(createPostViewModel, user);
 
             if (result)
@@ -122,7 +143,16 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(postEditViewModel.Slug, postEditViewModel.PostId);
+            var slug = CreateSlug(postEditViewModel.Slug);
+
+            if (string.IsNullOrEmpty(slug))
+            {
+                ViewData[ViewDataEditPostResult] =
+                    "Slug contains reserved characters, please only use letters and spaces.";
+                return View(postEditViewModel);
+            }
+
+            var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(slug, postEditViewModel.PostId);
 
             if (slugIsUnique)
             {
@@ -179,6 +209,68 @@ namespace Blog.Controllers
 
             ViewData[ViewDataDeletePostResult] = "Unexpected error occurred! Please try again.";
             return View(deleteViewModel);
+        }
+
+        /**
+         * Formats user input slug into a valid slug that can be used in a url
+         */
+        public static string CreateSlug(string slug)
+        {
+            slug = slug.ToLowerInvariant().Replace(" ", "-");
+            slug = RemoveDiacritics(slug);
+            slug = RemoveReservedUrlCharacters(slug);
+            slug = RemoveRepeatedHyphens(slug);
+
+            return slug.ToLowerInvariant();
+        }
+
+        /**
+         * Used to remove unwanted characters from slug
+         */
+        private static string RemoveReservedUrlCharacters(string text)
+        {
+            var reservedCharacters = new List<string>
+            {
+                "!", "#", "$", "&", "'", "(", ")", "*", ",", "/", ":", ";", "=", "?", "@", "[", "]", "\"", "%", ".",
+                "<", ">", "\\", "^", "_", "'", "{", "}", "|", "~", "`", "+", "£", "¬"
+            };
+
+            foreach (var chr in reservedCharacters)
+            {
+                text = text.Replace(chr, "");
+            }
+
+            return text;
+        }
+
+        /**
+         * Used to remove unwanted diacritics from slug
+         */
+        private static string RemoveDiacritics(string text)
+        {
+            var normalizedString = text.Normalize(NormalizationForm.FormD);
+            var stringBuilder = new StringBuilder();
+
+            foreach (var c in normalizedString)
+            {
+                var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
+                if (unicodeCategory != UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
+
+            return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+        /**
+         * Removes repeated hyphens from text
+         */
+        private static string RemoveRepeatedHyphens(string text)
+        {
+            var initialTrim = Regex.Replace(text, "-+", "-");
+            var finalTrim = initialTrim.Trim('-');
+            return finalTrim;
         }
     }
 }
