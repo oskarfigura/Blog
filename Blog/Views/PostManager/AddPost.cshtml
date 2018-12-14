@@ -1,7 +1,85 @@
 ﻿@model PostCreateViewModel
 @{
-    ViewData["Title"] = "AddPost";
+    ViewData["Title"] = "Create New Post";
 }
 
-<h2>AddPost</h2>
+<h2>@ViewData["Title"]</h2>
 
+<hr/>
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="AddPost" asp-antiforgery="true" class="postForm" method="post"
+              novalidate="novalidate">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"></label>
+                <input asp-for="Title" class="form-control" type="text" required="required"
+                       data-msg="Please enter a title."/>
+            </div>
+            <div class="form-group">
+                <label asp-for="Slug" class="control-label"></label>
+                <p>This is the part of the URL that will be used to identify this post</p>
+                <input asp-for="Slug" class="form-control" type="text" required="required"
+                       data-msg="Please enter a slug."/>
+            </div>
+            <div class="form-group">
+                <label asp-for="Publish"></label>
+                <input asp-for="Publish" type="checkbox"/>
+            </div>
+            <div class="form-group">
+                <label asp-for="Content" class="control-label"></label>
+                <textarea asp-for="Content" class="summernote form-control" required="required" 
+                data-msg="Post content cannot be empty." style="display: none;">
+                </textarea>
+            </div>
+
+            <div class="form-group">
+                @Html.ActionLink("Back to List", "Index", new {}, new {@class = "btn btn-danger"})
+                <input type="submit" value="Create" class="btn btn-success" id="btnSubmit"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="@Url.Content("https://cdn.jsdelivr.net/npm/jquery-validation@1.14.0/dist/jquery.validate.min.js")"></script>
+
+    <script>
+        $(document).ready(function() {
+            $(function() {
+                var postForm = $('.postForm');
+                var contentEditor = $('.summernote');
+
+                var postFormValidation = postForm.validate({
+                    errorElement: "div",
+                    errorClass: 'is-invalid',
+                    validClass: 'is-valid',
+                    ignore: ':hidden:not(.summernote),.note-editable.card-block',
+                    title: { rangelength: [10, 250] },
+                    errorPlacement: function(error, element) {
+                        error.addClass("invalid-feedback");
+                        error.addClass("text-danger");
+                        if (element.prop("type") === "checkbox") {
+                            error.insertAfter(element.siblings("label"));
+                        } else if (element.hasClass("summernote")) {
+                            error.insertAfter(element.siblings(".note-editor"));
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    }
+                });
+
+                contentEditor.summernote({
+                    height: 300,
+                    callbacks: {
+                        onChange: function(contents, $editable) {
+                            contentEditor.val(contentEditor.summernote('isEmpty') ? "" : contents);
+                            postFormValidation.element(contentEditor);
+                        }
+                    }
+                });
+
+            });
+        });
+    </script>
+}
