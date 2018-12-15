@@ -6568,7 +6568,7 @@
           var $container = this.options.dialogsInBody ? this.$body : this.$editor;
           var body = [
               '<div class="form-group note-form-group row-fluid">',
-              "<label class=\"note-form-label\">" + this.lang.video.url + " <small class=\"text-muted\">" + this.lang.video.providers + "</small></label>",
+              "<label class=\"note-form-label\">" + this.lang.video.url + " <small class=\"text-muted\">" + "(YouTube, Vimeo, DailyMotion)" + "</small></label>",
               '<input class="note-video-url form-control note-form-control note-input" type="text" />',
               '</div>'
           ].join('');
@@ -6636,19 +6636,23 @@
                   .attr('width', '640').attr('height', '360');
           }
           else if (igMatch && igMatch[0].length) {
-              $video = $$1('<iframe>')
-                  .attr('frameborder', 0)
-                  .attr('src', 'https://instagram.com/p/' + igMatch[1] + '/embed/')
-                  .attr('width', '612').attr('height', '710')
-                  .attr('scrolling', 'no')
-                  .attr('allowtransparency', 'true');
+//              $video = $$1('<iframe>')
+//                  .attr('frameborder', 0)
+//                  .attr('src', 'https://instagram.com/p/' + igMatch[1] + '/embed/')
+//                  .attr('width', '612').attr('height', '710')
+//                  .attr('scrolling', 'no')
+//                  .attr('allowtransparency', 'true');
+              alert("Video link not supported");
+              return false;
           }
           else if (vMatch && vMatch[0].length) {
-              $video = $$1('<iframe>')
-                  .attr('frameborder', 0)
-                  .attr('src', vMatch[0] + '/embed/simple')
-                  .attr('width', '600').attr('height', '600')
-                  .attr('class', 'vine-embed');
+//              $video = $$1('<iframe>')
+//                  .attr('frameborder', 0)
+//                  .attr('src', vMatch[0] + '/embed/simple')
+//                  .attr('width', '600').attr('height', '600')
+//                  .attr('class', 'vine-embed');
+              alert("Video link not supported");
+              return false;
           }
           else if (vimMatch && vimMatch[3].length) {
               $video = $$1('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
@@ -6663,27 +6667,34 @@
                   .attr('width', '640').attr('height', '360');
           }
           else if (youkuMatch && youkuMatch[1].length) {
-              $video = $$1('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
-                  .attr('frameborder', 0)
-                  .attr('height', '498')
-                  .attr('width', '510')
-                  .attr('src', '//player.youku.com/embed/' + youkuMatch[1]);
+//              $video = $$1('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
+//                  .attr('frameborder', 0)
+//                  .attr('height', '498')
+//                  .attr('width', '510')
+//                  .attr('src', '//player.youku.com/embed/' + youkuMatch[1]);
+              alert("Video link not supported");
+              return false;
           }
           else if ((qqMatch && qqMatch[1].length) || (qqMatch2 && qqMatch2[2].length)) {
-              var vid = ((qqMatch && qqMatch[1].length) ? qqMatch[1] : qqMatch2[2]);
-              $video = $$1('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
-                  .attr('frameborder', 0)
-                  .attr('height', '310')
-                  .attr('width', '500')
-                  .attr('src', 'http://v.qq.com/iframe/player.html?vid=' + vid + '&amp;auto=0');
+//              var vid = ((qqMatch && qqMatch[1].length) ? qqMatch[1] : qqMatch2[2]);
+//              $video = $$1('<iframe webkitallowfullscreen mozallowfullscreen allowfullscreen>')
+//                  .attr('frameborder', 0)
+//                  .attr('height', '310')
+//                  .attr('width', '500')
+//                  .attr('src', 'http://v.qq.com/iframe/player.html?vid=' + vid + '&amp;auto=0');
+              alert("Video link not supported");
+              return false;
           }
           else if (mp4Match || oggMatch || webmMatch) {
-              $video = $$1('<video controls>')
-                  .attr('src', url)
-                  .attr('width', '640').attr('height', '360');
+//              $video = $$1('<video controls>')
+//                  .attr('src', url)
+//                  .attr('width', '640').attr('height', '360');
+              alert("Video link not supported");
+              return false;
           }
           else {
               // this is not a known video link. Now what, Cat? Now what?
+              alert("Video link not supported");
               return false;
           }
           $video.addClass('note-video-clip');
