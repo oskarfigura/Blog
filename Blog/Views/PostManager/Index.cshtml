@@ -48,7 +48,7 @@
                         @Html.DisplayFor(modelItem => item.IsPublished)
                     </td>
                     <td>
-                        @Html.ActionLink("View", "ViewPost", new {slug = @item.Slug }) |
+                        @Html.ActionLink("View", "Post", new {slug = @item.Slug }) |
                         @Html.ActionLink("Edit", "Edit", new { postId = @item.Id }) |
                         @Html.ActionLink("Delete", "Delete", new { postId = @item.Id })
                     </td>

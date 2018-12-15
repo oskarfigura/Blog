@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@model PostViewModel
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container container-fluid">
+    <div class="col-md-12">
+        <h2>@Model.Title</h2>
+        <h5>Published @Model.PubDate</h5>
+
+        @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded)
+        {
+            <button type="button" onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @Model.Id})'"
+                    class="btn btn-primary btn-xs">
+                Edit Post
+            </button>
+            <button type="button" onclick="location.href = '@Url.Action("Delete", "PostManager", new {postId = @Model.Id})'"
+                    class="btn btn-danger btn-xs">
+                Delete Post
+            </button>
+        }
+        <hr />
+
+        @Html.Raw(Model.Content)
+    </div>
+</div>
+
+@* class="img-responsive center-block" *@
