@@ -8,6 +8,7 @@ namespace Blog.Models
 {
     public class PostViewModel
     {
+        [Required]
         public string Id { get; set; }
 
         [Required]
@@ -27,11 +28,6 @@ namespace Blog.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM-dd-yyyy hh:mm tt}")]
         [Display(Name = "Date Posted")]
         public DateTime PubDate { get; set; }
-
-        [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM-dd-yyyy hh:mm tt}")]
-        [Display(Name = "Date Edited")]
-        public DateTime EditDate { get; set; }
 
         public IEnumerable<Comment> Comments { get; set; } = new List<Comment>();
 
