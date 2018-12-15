@@ -26,7 +26,7 @@ namespace Blog.Areas.Identity.Data
             {
                 var post = CreatePost(postCreateViewModel, author);
                 await _context.Posts.AddAsync(post);
-                Save();
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -87,7 +87,7 @@ namespace Blog.Areas.Identity.Data
                 }
 
                 _context.Posts.Remove(post);
-                Save();
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -108,7 +108,7 @@ namespace Blog.Areas.Identity.Data
                 post.EditDate = DateTime.Now;
 
                 _context.Posts.Update(post);
-                Save();
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
@@ -139,7 +139,7 @@ namespace Blog.Areas.Identity.Data
             return postContainingSlug.Count == 0;
         }
 
-        public async void Save()
+        public async Task Save()
         {
             await _context.SaveChangesAsync();
         }
