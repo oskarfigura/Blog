@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
 using Blog.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.Controllers
@@ -32,7 +33,7 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            var post = await _postRepo.GetPostBySlug(slug);
+            var post = await _postRepo.GetPublishedPostBySlug(slug);
 
             if (string.IsNullOrEmpty(post.Id))
             {

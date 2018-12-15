@@ -49,15 +49,29 @@ namespace Blog.Controllers
             });
         }
 
-        // GET: PostManager/ViewPost, redirect to post view
-        public IActionResult ViewPost(string slug)
+        [Route("/PostManager/ViewPost/{slug?}")]
+        public async Task<IActionResult> Post(string slug)
         {
             if (string.IsNullOrEmpty(slug))
             {
                 return NotFound();
             }
 
-            return RedirectToAction("Post", "Blog", new {slug});
+            var post = await _postRepo.GetPostBySlug(slug);
+
+            if (string.IsNullOrEmpty(post.Id))
+            {
+                return NotFound();
+            }
+
+            return View(new PostViewModel()
+            {
+                Id = post.Id,
+                Title = post.Title,
+                Content = post.Content,
+                PubDate = post.PubDate,
+                //TODO Load comments
+            });
         }
 
         // GET: PostManager/AddPost, view for adding a new post
