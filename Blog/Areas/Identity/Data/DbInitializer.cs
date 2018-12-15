@@ -4,9 +4,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace Blog.Areas.Identity.Data
 {
@@ -48,6 +53,8 @@ namespace Blog.Areas.Identity.Data
             var userManager = serviceProvider.GetRequiredService<UserManager<BlogUser>>();
             await SeedRoles(roleManager);
             await SeedUsers(userManager);
+            //SeedBlogPosts -> 
+            //ReadBlogPosts();    //TODO Reading blog posts from file
         }
 
         //Seed database with roles
@@ -174,9 +181,33 @@ namespace Blog.Areas.Identity.Data
             }
         }
 
-        //private async Task SeedBlogPosts()
-        //{
+        //        private async Task SeedBlogPosts()
+        //        {
+        //          readBlogPosts() --> Seed the db using this data
+        //        }
 
-        //}
+        private void ReadBlogPosts()
+        {
+            var data = "";
+            const string path = @"Areas/Identity/Data/BlogPosts/posts.json";
+
+            using (var file = new StreamReader(path))
+            {
+                data = file.ReadToEnd();
+            }
+
+            var result = JsonConvert.DeserializeObject<PostJsonResult>(data);
+
+            foreach (var post in result.Posts)
+            {
+                /*
+                 *
+                 * var user = await userManager.FindByNameAsync(post.AuthorUserName);
+                 * post.AuthorId = user.Id;
+                 */
+                //Check user for each post and get userId
+                //Seed db with post
+            }
+        }
     }
 }
