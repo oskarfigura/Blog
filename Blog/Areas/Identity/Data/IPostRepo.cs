@@ -13,6 +13,7 @@ namespace Blog.Areas.Identity.Data
         Task<IEnumerable<Post>> GetPostsBySearchData(string searchData);
         Task<Post> GetPostById(string postId);
         Task<Post> GetPostBySlug(string slug);
+        Task<Post> GetPublishedPostBySlug(string slug);
         Task<bool> DeletePost(string id);
         Task<bool> UpdatePost(PostEditViewModel postEditViewModel);
         Task<bool> CheckIfSlugIsUnique(string slug, string postId);

@@ -53,6 +53,12 @@ namespace Blog.Areas.Identity.Data
             return post.DefaultIfEmpty(new Post()).FirstOrDefault();
         }
 
+        public async Task<Post> GetPublishedPostBySlug(string slug)
+        {
+            var post = await _context.Posts.Where(p => p.Slug.Equals(slug) && p.IsPublished).ToListAsync();
+            return post.DefaultIfEmpty(new Post()).FirstOrDefault();
+        }
+
         public async Task<IEnumerable<Post>> GetPostsBySearchData(string searchData)
         {
             var postList = await GetAllPosts();
