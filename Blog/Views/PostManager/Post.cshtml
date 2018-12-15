@@ -2,6 +2,7 @@
 @inject IAuthorizationService AuthorizationService
 @model PostViewModel
 @{
+    ViewData["Title"] = @Model.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -26,5 +27,3 @@
         @Html.Raw(Model.Content)
     </div>
 </div>
-
-@* class="img-responsive center-block" *@

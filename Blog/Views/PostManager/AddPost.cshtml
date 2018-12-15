@@ -94,6 +94,7 @@
 
                 contentEditor.summernote({
                     height: 600,
+                    disableResizeImage: true,
                     callbacks: {
                         onChange: function(contents, $editable) {
                             contentEditor.val(contentEditor.summernote('isEmpty') ? "" : contents);
