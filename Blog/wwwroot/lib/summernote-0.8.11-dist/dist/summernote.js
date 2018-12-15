@@ -2683,7 +2683,8 @@
               $img.off('load').detach();
               deferred.reject($img);
           }).css({
-              display: 'none'
+              display: 'none',
+              style: 'width: 100%;'
           }).appendTo(document.body).attr('src', url);
       }).promise();
   }
