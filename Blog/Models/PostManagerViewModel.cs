@@ -8,6 +8,6 @@ namespace Blog.Models
     public class PostManagerViewModel
     {
         public IEnumerable<Post> BlogPosts { get; set; }
-        public string SearchTitle { get; set; }
+        public PostManagerSearch SearchData { get; set; }
     }
 }
