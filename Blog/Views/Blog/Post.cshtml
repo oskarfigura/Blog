@@ -14,7 +14,7 @@
         @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded)
         {
             <button type="button"
-                    onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @Model.Id})'"
+                    onclick="location.href = '@Url.Action("Edit", "Blog", new {postId = @Model.Id})'"
                     class="btn btn-primary btn-xs pull-left" style="margin-right: 5px">
                 Edit Post
             </button>
@@ -22,7 +22,7 @@
 
         @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
         {
-            <form asp-controller="PostManager" asp-action="Delete" asp-route-postId="@Model.Id"
+            <form asp-controller="Blog" asp-action="Delete" asp-route-postId="@Model.Id"
                   method="post" id="postDeleteForm">
                 @Html.AntiForgeryToken()
                 <input id="btnDeletePost" type="submit" value="Delete Post"

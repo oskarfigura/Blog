@@ -14,7 +14,7 @@
                 <p>@comment.Content</p>
                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteComment")).Succeeded)
                 {
-                    <button type="button" onclick="location.href = '@Url.Action("DeleteComment", "PostManager", new {commentId = @comment.Id, postSlug = @Model.Slug})'"
+                    <button type="button" onclick="location.href = '@Url.Action("DeleteComment", "Blog", new {commentId = @comment.Id, postSlug = @Model.Slug})'"
                             class="btn btn-primary btn-xs">
                         Delete comment
                     </button>
