@@ -41,6 +41,12 @@ namespace Blog.Areas.Identity.Data
             return postList ?? new List<Post>();
         }
 
+        public async Task<IEnumerable<Post>> GetAllPublishedPosts()
+        {
+            var postList = await _context.Posts.Where(p => p.IsPublished).ToListAsync();
+            return postList ?? new List<Post>();
+        }
+
         public async Task<Post> GetPostById(string postId)
         {
             var post = await _context.Posts.Where(p => p.Id.Equals(postId)).ToListAsync();
@@ -122,6 +128,7 @@ namespace Blog.Areas.Identity.Data
                 post.Description = postEditViewModel.Description;
                 post.Slug = postEditViewModel.Slug;
                 post.EditDate = DateTime.Now;
+                post.IsPublished = postEditViewModel.Published;
 
                 _context.Posts.Update(post);
                 await _context.SaveChangesAsync();

@@ -10,6 +10,7 @@ namespace Blog.Areas.Identity.Data
     {
         Task<bool> AddPost(PostCreateViewModel postCreateViewModel, User author);
         Task<IEnumerable<Post>> GetAllPosts();
+        Task<IEnumerable<Post>> GetAllPublishedPosts();
         Task<IEnumerable<Post>> GetPostsBySearchData(PostManagerSearch searchData);
         Task<Post> GetPostById(string postId);
         Task<Post> GetPostBySlug(string slug);
