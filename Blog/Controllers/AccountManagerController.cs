@@ -11,7 +11,7 @@ namespace Blog.Controllers
     public class AccountManagerController : Controller
     {
         private const string TempDataOperationParam = "UserOperationResult";
-        private const string ViewDataManagerMsgParam = "ManagerMessage";
+        private const string ViewDataManagerMsgParam = "AccManagerMessage";
         private const string ViewDataEditResult = "EditResult";
         private const string ViewDataDeleteResult = "DeleteResult";
 
