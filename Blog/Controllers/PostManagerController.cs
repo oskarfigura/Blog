@@ -23,6 +23,7 @@ namespace Blog.Controllers
         private const string ViewDataAddPostResult = "AddPostResult";
         private const string ViewDataEditPostResult = "EditPostResult";
         private const string ViewDataDeletePostResult = "DeletePostResult";
+        private const string ViewDataPostResultMsg = "PostResultMsg";
         private const string MsgSomethingIsWrong = "Something went wrong. Please try again.";
 
         private readonly IPostRepo _postRepo;
@@ -39,7 +40,7 @@ namespace Blog.Controllers
             //TODO Run this method to store posts which will be used for db seeding in the future
             //TODO StoreAllPostsInJsonFile();
 
-            var postSearchData = postManagerView.SearchTitle;
+            var postSearchData = postManagerView.SearchData;
 
             //Get any result messages from CRUD operations on posts
             if (TempData[TempDataOperationParam] != null)
@@ -50,7 +51,7 @@ namespace Blog.Controllers
             return View(new PostManagerViewModel
             {
                 BlogPosts = await _postRepo.GetPostsBySearchData(postSearchData),
-                SearchTitle = postSearchData
+                SearchData = postSearchData
             });
         }
 
@@ -205,38 +206,15 @@ namespace Blog.Controllers
 
                 if (!updateResult)
                 {
-                    ViewData[ViewDataEditPostResult] = "Unable to edit post. Please try again later.";
+                    ViewData[ViewDataEditPostResult] = "Unable to edit post. Please try again.";
                 }
-
+                ViewData[ViewDataEditPostResult] = "Post updated successfully.";
                 return View(postEditViewModel);
             }
 
             ViewData[ViewDataEditPostResult] = "Slug already exists, please enter a different slug.";
             return View(postEditViewModel);
         }
-
-//        // GET: PostManager/Delete, Display delete post view
-//        [Authorize(Policy = "CanDeletePosts")]
-//        public async Task<IActionResult> Delete(string postId)
-//        {
-//            if (string.IsNullOrEmpty(postId))
-//            {
-//                return NotFound();
-//            }
-//
-//            var post = await _postRepo.GetPostById(postId);
-//
-//            if (string.IsNullOrEmpty(post.Id))
-//            {
-//                return NotFound();
-//            }
-//
-//            return View(new PostDeleteViewModel()
-//            {
-//                PostId = post.Id,
-//                Title = post.Title,
-//            });
-//        }
 
         // POST: PostManager/Delete, process deleting a post
         [Authorize(Policy = "CanDeletePosts")]
@@ -246,28 +224,25 @@ namespace Blog.Controllers
         {
             var deleteResult = await _postRepo.DeletePost(postId);
 
-            if (deleteResult)
-            {
-                TempData[TempDataOperationParam] = "Post deleted successfully.";
-                return RedirectToAction("Index");
-            }
+            if (!deleteResult) return RedirectToAction("Index");
 
-            ViewData[TempDataOperationParam] = "Unexpected error occurred! Please try again.";
+            TempData[TempDataOperationParam] = "Post deleted successfully.";
             return RedirectToAction("Index");
         }
 
-        
-        // GET: PostManager/Delete, Display delete post view
+        // POST: PostManager/Delete, process deleting a comment
         [Authorize(Policy = "CanDeleteComment")]
+        [HttpPost, ActionName("DeleteComment")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteComment(string commentId, string postSlug)
         {
-//            if (string.IsNullOrEmpty(commentId))
-//            {
-//                return NotFound();
-//            }
-//
-//            var comment = await _postRepo.GetCommentById(commentId);
-//
+            if (string.IsNullOrEmpty(commentId))
+            {
+                return NotFound();
+            }
+
+            //var comment = await _postRepo.GetCommentById(commentId);
+
 //            if (string.IsNullOrEmpty(comment.Id))
 //            {
 //                return NotFound();
