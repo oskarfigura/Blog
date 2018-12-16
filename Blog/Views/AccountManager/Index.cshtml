@@ -3,118 +3,101 @@
     ViewData["Title"] = "Account Manager";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<h2>@ViewData["Title"]</h2>
-<hr />
-@if (!Model.Accounts.Any())
-{
-    <h4>Unable to display a list of registered accounts.</h4>
-}
-
-@if (Model.Accounts.Any())
-{
-    <div class="container">
-        <div class="form-group">
-            @using (Html.BeginForm("Index", "AccountManager", FormMethod.Get, new {id = "searchForm"}))
-            {
-                <div class="form-group">
-                    <label for="inputSearchUserName">Find by username:</label>
-
-                    @Html.TextBoxFor(m => m.AccountSearch.UserName, new
-                    {
-                        @class = "form-control", @id = "inputSearchUserName", @placeholder = "Search by username"
-                    })
-                </div>
-
-                <div class="form-group">
-                    <label for="filterByRole">Filter by role:</label>
-
-                    @Html.DropDownListFor(m => m.AccountSearch.Role, Model.AvailableIdentityRoles.Select(item => new SelectListItem
-                    {Value = item.Name.ToString(), Text = item.Name.ToString(),}), "All Roles", new {@class = "form-control", @id = "filterByRole"})
-
-                </div>
-                <button type="submit" class="btn btn-primary">Search</button>
-            }
-        </div>
-
-        <div class="table-responsive">
-            <table class="table">
-                <tr>
-                    <th>
-                        Username
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Accounts.First().Email)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Accounts.First().Name)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Accounts.First().DisplayName)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Accounts.First().Role)
-                    </th>
-                    <th></th>
-                </tr>
-
-                @foreach (var user in Model.Accounts)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => user.UserName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => user.Email)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => user.Name)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => user.DisplayName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => user.Role)
-                        </td>
-                        <td>
-                            @Html.ActionLink("Edit", "Edit", new {userName = user.UserName}) |
-                            @Html.ActionLink("Details", "Details", new {userName = user.UserName}) |
-                            @Html.ActionLink("Delete", "Delete", new {userName = user.UserName})
-                        </td>
-                    </tr>
-                }
-            </table>
-        </div>
-        @if (ViewData["ManagerMessage"] != null)
+<div class="container-fluid">
+    <div class="row">
+        <h2>@ViewData["Title"]</h2>
+        <hr/>
+        @if (!Model.Accounts.Any())
         {
-            <!-- Modal -->
-            <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModal" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h2 class="modal-title">Message:</h2>
-                        </div>
-                        <div class="modal-body">
-                            <h3>@ViewData["ManagerMessage"]</h3>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <h4>Unable to display a list of registered accounts.</h4>
         }
     </div>
-}
+    @if (Model.Accounts.Any())
+    {
+        <div class="row">
+            <div class="form-group">
+                @using (Html.BeginForm("Index", "AccountManager", FormMethod.Get, new {id = "searchForm"}))
+                {
+                    <div class="form-group">
+                        <label for="inputSearchUserName">Find by username:</label>
 
-@section Scripts
+                        @Html.TextBoxFor(m => m.AccountSearch.UserName, new
+                        {
+                            @class = "form-control", @id = "inputSearchUserName", @placeholder = "Search by username"
+                        })
+                    </div>
+
+                    <div class="form-group">
+                        <label for="filterByRole">Filter by role:</label>
+
+                        @Html.DropDownListFor(m => m.AccountSearch.Role, Model.AvailableIdentityRoles.Select(item => new SelectListItem
+                        {Value = item.Name.ToString(), Text = item.Name.ToString(),}), "All Roles", new {@class = "form-control", @id = "filterByRole"})
+
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                        <th>
+                            Username
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Accounts.First().Email)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Accounts.First().Name)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Accounts.First().DisplayName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Accounts.First().Role)
+                        </th>
+                        <th></th>
+                    </tr>
+
+                    @foreach (var user in Model.Accounts)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => user.UserName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => user.Email)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => user.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => user.DisplayName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => user.Role)
+                            </td>
+                            <td>
+                                @Html.ActionLink("Edit", "Edit", new {userName = user.UserName}) |
+                                @Html.ActionLink("Details", "Details", new {userName = user.UserName}) |
+                                @Html.ActionLink("Delete", "Delete", new {userName = user.UserName})
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    }
+</div>
+@if (ViewData["ManagerMessage"] != null)
 {
-    <script>
-        $(document).ready(function() {
-            $(function() {
-                $('#messageModal').modal('show');
+    @section Scripts
+    {
+        <script>
+            $(document).ready(function() {
+                swal("@ViewData["AccManagerMessage"]", { icon: "info" });
             });
-        });
-    </script>
+        </script>
+    }
 }
-
