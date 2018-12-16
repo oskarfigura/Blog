@@ -13,7 +13,8 @@
 
         @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded)
         {
-            <button type="button" onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @Model.Id})'"
+            <button type="button"
+                    onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @Model.Id})'"
                     class="btn btn-primary btn-xs pull-left" style="margin-right: 5px">
                 Edit Post
             </button>
@@ -21,11 +22,12 @@
 
         @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
         {
-            using (Html.BeginForm("Delete", "PostManager", new {postId = Model.Id}, FormMethod.Post))
-            {
+            <form asp-controller="PostManager" asp-action="Delete" asp-route-postId="@Model.Id"
+                  method="post" id="postDeleteForm">
                 @Html.AntiForgeryToken()
-                <input id="btnDeleteComment" type="submit" value="Delete Post" class="btn btn-danger btn-xs pull-left" onclick="return confirm('Are you sure?')"/>
-            }
+                <input id="btnDeletePost" type="submit" value="Delete Post"
+                       class="btn btn-danger btn-xs pull-left"/>
+            </form>
         }
         <div class="clearfix"></div>
         <hr/>
@@ -45,7 +47,9 @@
             </div>
             <div class="form-group">
                 <label asp-for="Content" class="control-label"></label>
-                <textarea asp-for="Content" id="textEditor" class="form-control" style="resize: vertical;" rows="5"></textarea>
+                <textarea asp-for="Content" id="textEditor" class="form-control" 
+                    style="resize: vertical;" rows="5">
+                </textarea>
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -59,3 +63,34 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $("#btnDeletePost").click(function(e) {
+                e.preventDefault();
+
+                swal({
+                        title: "Are you sure?",
+                        text: "This post will be deleted permanently!",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $('#postDeleteForm').submit();
+                        }
+                    });
+            });
+        });
+    </script>
+    @if (ViewData["PostResultMsg"] != null)
+    {
+        <script>
+            $(document).ready(function() {
+                swal("@ViewData["PostResultMsg"]", { icon: "info" });
+            });
+        </script>
+    }
+}
