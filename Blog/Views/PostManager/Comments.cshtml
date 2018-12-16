@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@model PostViewModel
+
+<h2>Comments</h2>
+
+@foreach (var comment in Model.Comments)
+{
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h3>@comment.AuthorDisplayName</h3>
+                <h4>@comment.PubDate</h4>
+                <p>@comment.Content</p>
+                @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteComment")).Succeeded)
+                {
+                    <button type="button" onclick="location.href = '@Url.Action("DeleteComment", "PostManager", new {commentId = @comment.Id, postSlug = @Model.Slug})'"
+                            class="btn btn-primary btn-xs">
+                        Delete comment
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+}
+

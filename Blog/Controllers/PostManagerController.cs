@@ -82,7 +82,7 @@ namespace Blog.Controllers
                 Title = post.Title,
                 Content = formattedContent,
                 PubDate = post.PubDate,
-                //TODO Load comments
+                Comments = post.Comments
             });
         }
 
@@ -253,6 +253,26 @@ namespace Blog.Controllers
 
             ViewData[ViewDataDeletePostResult] = "Unexpected error occurred! Please try again.";
             return View(deleteViewModel);
+        }
+
+        
+        // GET: PostManager/Delete, Display delete post view
+        [Authorize(Policy = "CanDeleteComment")]
+        public async Task<IActionResult> DeleteComment(string commentId, string postSlug)
+        {
+//            if (string.IsNullOrEmpty(commentId))
+//            {
+//                return NotFound();
+//            }
+//
+//            var comment = await _postRepo.GetCommentById(commentId);
+//
+//            if (string.IsNullOrEmpty(comment.Id))
+//            {
+//                return NotFound();
+//            }
+
+            return RedirectToAction("Post", new { postSlug });
         }
 
         /**
