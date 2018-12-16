@@ -171,6 +171,7 @@ namespace Blog.Controllers
                 PostId = post.Id,
                 Title = post.Title,
                 Content = post.Content,
+                Description = post.Description,
                 Slug = post.Slug,
                 Published = post.IsPublished
             });
@@ -214,36 +215,36 @@ namespace Blog.Controllers
             return View(postEditViewModel);
         }
 
-        // GET: PostManager/Delete, Display delete post view
-        [Authorize(Policy = "CanDeletePosts")]
-        public async Task<IActionResult> Delete(string postId)
-        {
-            if (string.IsNullOrEmpty(postId))
-            {
-                return NotFound();
-            }
-
-            var post = await _postRepo.GetPostById(postId);
-
-            if (string.IsNullOrEmpty(post.Id))
-            {
-                return NotFound();
-            }
-
-            return View(new PostDeleteViewModel()
-            {
-                PostId = post.Id,
-                Title = post.Title,
-            });
-        }
+//        // GET: PostManager/Delete, Display delete post view
+//        [Authorize(Policy = "CanDeletePosts")]
+//        public async Task<IActionResult> Delete(string postId)
+//        {
+//            if (string.IsNullOrEmpty(postId))
+//            {
+//                return NotFound();
+//            }
+//
+//            var post = await _postRepo.GetPostById(postId);
+//
+//            if (string.IsNullOrEmpty(post.Id))
+//            {
+//                return NotFound();
+//            }
+//
+//            return View(new PostDeleteViewModel()
+//            {
+//                PostId = post.Id,
+//                Title = post.Title,
+//            });
+//        }
 
         // POST: PostManager/Delete, process deleting a post
         [Authorize(Policy = "CanDeletePosts")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(PostDeleteViewModel deleteViewModel)
+        public async Task<IActionResult> Delete(string postId)
         {
-            var deleteResult = await _postRepo.DeletePost(deleteViewModel.PostId);
+            var deleteResult = await _postRepo.DeletePost(postId);
 
             if (deleteResult)
             {
@@ -251,8 +252,8 @@ namespace Blog.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewData[ViewDataDeletePostResult] = "Unexpected error occurred! Please try again.";
-            return View(deleteViewModel);
+            ViewData[TempDataOperationParam] = "Unexpected error occurred! Please try again.";
+            return RedirectToAction("Index");
         }
 
         

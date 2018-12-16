@@ -23,6 +23,10 @@ namespace Blog.Models
         public string Content { get; set; }
 
         [Required]
+        [DataType(DataType.Html)]
+        public string Description { get; set; }
+
+        [Required]
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM-dd-yyyy hh:mm tt}")]
         [Display(Name = "Date Posted")]

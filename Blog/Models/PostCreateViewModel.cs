@@ -23,6 +23,11 @@ namespace Blog.Models
         [Display(Name = "Content")]
         public string Content { get; set; }
 
+        [Required]
+        [DataType(DataType.Text)]
+        [Display(Name = "Description")]
+        public string Description { get; set; }
+
         [Display(Name = "Publish Post")]
         public bool Publish { get; set; }
     }

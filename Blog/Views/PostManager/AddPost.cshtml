@@ -27,6 +27,13 @@
                 <input asp-for="Publish" type="checkbox"/>
             </div>
             <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <p>Short post description displayed on home-page</p>
+                <textarea asp-for="Description" class="form-control" required="required" 
+                data-msg="Post description cannot be empty." style="resize: vertical;" rows="5">
+                </textarea>
+            </div>
+            <div class="form-group">
                 <label asp-for="Content" class="control-label"></label>
                 <textarea asp-for="Content" class="summernote form-control" required="required" 
                 data-msg="Post content cannot be empty." style="display: none;">
@@ -79,7 +86,7 @@
                     validClass: 'is-valid',
                     ignore: ':hidden:not(.summernote),.note-editable.card-block',
                     title: { rangelength: [10, 250] },
-                    errorPlacement: function(error, element) {
+                    errorPlacement: function (error, element) {
                         error.addClass("invalid-feedback");
                         error.addClass("text-danger");
                         if (element.prop("type") === "checkbox") {

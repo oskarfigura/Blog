@@ -104,6 +104,7 @@ namespace Blog.Areas.Identity.Data
 
                 post.Title = postEditViewModel.Title;
                 post.Content = postEditViewModel.Content;
+                post.Description = postEditViewModel.Description;
                 post.Slug = postEditViewModel.Slug;
                 post.EditDate = DateTime.Now;
 
@@ -172,6 +173,7 @@ namespace Blog.Areas.Identity.Data
             {
                 Title = post.Title,
                 Content = post.Content,
+                Description = post.Description,
                 Slug = post.Slug,
                 IsPublished = post.Publish,
                 PubDate = DateTime.Now,
