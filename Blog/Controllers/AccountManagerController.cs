@@ -119,44 +119,23 @@ namespace Blog.Controllers
             return View(accountViewModel);
         }
 
-        // GET: AccountManager/Delete, Display delete account view
-        [Authorize(Policy = "CanDeleteUsers")]
-        public async Task<IActionResult> Delete(string userName)
-        {
-            if (string.IsNullOrEmpty(userName))
-            {
-                return NotFound();
-            }
-
-            var user = await _userRepo.GetUserByUserName(userName);
-
-            if (string.IsNullOrEmpty(user.UserName))
-            {
-                return NotFound();
-            }
-
-            return View(new AccountDeleteViewModel
-            {
-                UserName = user.UserName
-            });
-        }
-
         // POST: AccountManager/Delete, process deleting account
         [Authorize(Policy = "CanDeleteUsers")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(AccountDeleteViewModel deleteViewModel)
+        public async Task<IActionResult> Delete(string userName)
         {
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var user = await _userRepo.GetUserById(currentUserId);
 
-            if (deleteViewModel.UserName.Equals(user.UserName))
+            if (userName.Equals(user.UserName))
             {
-                ViewData[ViewDataDeleteResult] = "You cannot delete yourself from account manager! Please do it in profile settings.";
-                return View(deleteViewModel);
+                TempData[TempDataOperationParam] = "You cannot delete yourself from account manager! " +
+                                                    "Please do it in your profile settings.";
+                return RedirectToAction("Index");
             }
 
-            var deleteResult = await _userRepo.DeleteUser(deleteViewModel.UserName);
+            var deleteResult = await _userRepo.DeleteUser(userName);
 
             if (deleteResult)
             {
@@ -164,8 +143,8 @@ namespace Blog.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewData[ViewDataDeleteResult] = "Unexpected error occurred! Please try again.";
-            return View(deleteViewModel);
+            TempData[TempDataOperationParam] = "Unexpected error occurred! Please try again.";
+            return RedirectToAction("Index");
         }
     }
 }

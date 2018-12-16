@@ -1,4 +1,6 @@
-﻿@model AccountManagerViewModel
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@model AccountManagerViewModel
 @{
     ViewData["Title"] = "Account Manager";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -79,20 +81,77 @@
                                 @Html.DisplayFor(modelItem => user.Role)
                             </td>
                             <td>
-                                @Html.ActionLink("Edit", "Edit", new {userName = user.UserName}) |
-                                @Html.ActionLink("Details", "Details", new {userName = user.UserName}) |
-                                @Html.ActionLink("Delete", "Delete", new {userName = user.UserName})
+                                @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteUsers")).Succeeded)
+                                {
+                                    <button type="button" id="btnDelete-@user.UserName" style="margin-right: 5px"
+                                            class="btn btn-danger btn-xs pull-right btnDeleteUser">
+                                        Delete
+                                    </button>
+                                }
+
+                                @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditUsers")).Succeeded)
+                                {
+                                    <button type="button"
+                                            onclick="location.href = '@Url.Action("Edit", "AccountManager",
+                                                                          new {userName = user.UserName})'"
+                                            class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
+                                        Edit
+                                    </button>
+                                }
+
+                                <button type="button"
+                                        onclick="location.href = '@Url.Action("Details", "AccountManager",
+                                                                      new {userName = user.UserName})'"
+                                        class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
+                                    View
+                                </button>
                             </td>
                         </tr>
                     }
                 </table>
             </div>
+            @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteUsers")).Succeeded)
+            {
+                <form asp-controller="AccountManager" asp-action="Delete" method="post" id="postDeleteUser">
+                    @Html.AntiForgeryToken()
+                </form>
+            }
         </div>
     }
 </div>
-@if (ViewData["AccManagerMessage"] != null)
+
+@section Scripts
 {
-    @section Scripts
+    @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteUsers")).Succeeded)
+    {
+        <script>
+            $(document).ready(function() {
+                $(".btnDeleteUser").click(function() {
+                    var btnId = this.id;
+                    var username = btnId.replace('btnDelete-', '');
+
+                    swal({
+                            title: "Are you sure?",
+                            text: "This user will be deleted permanently!",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true
+                        })
+                        .then((willDelete) => {
+                            if (willDelete) {
+
+                                var input = $("<input>")
+                                    .attr("type", "hidden")
+                                    .attr("name", "userName").val(username);
+                                $('#postDeleteUser').append(input);
+                                $('#postDeleteUser').submit();
+                            }
+                        });
+                });
+            });
+        </script>
+    }
+    @if (ViewData["AccManagerMessage"] != null)
     {
         <script>
             $(document).ready(function() {
