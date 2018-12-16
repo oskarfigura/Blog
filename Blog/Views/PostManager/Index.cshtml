@@ -75,6 +75,9 @@
                         <th>
                             @Html.DisplayNameFor(model => model.BlogPosts.First().IsPublished)
                         </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.BlogPosts.First().PubDate)
+                        </th>
                         <th></th>
                     </tr>
                     </thead>
@@ -92,14 +95,14 @@
                                 @Html.DisplayFor(modelItem => item.IsPublished)
                             </td>
                             <td>
+                                @Html.DisplayFor(modelItem => item.PubDate)
+                            </td>
+                            <td>
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
                                 {
-                                    <form asp-controller="PostManager" asp-action="Delete" asp-route-postId="@item.Id"
-                                          method="post" id="postDeleteForm">
-                                        @Html.AntiForgeryToken()
-                                        <input id="btnDeletePost" type="submit" value="Delete"
-                                               class="btn btn-danger btn-xs pull-right"/>
-                                    </form>
+                                    <button type="button" id="btnDelete-@item.Id" style="margin-right: 5px"
+                                            class="btn btn-danger btn-xs pull-right btnDeletePost" >Delete
+                                    </button>
                                 }
 
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded)
@@ -122,12 +125,49 @@
                     </tbody>
                 </table>
             </div>
+            @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
+            {
+                <form asp-controller="PostManager" asp-action="Delete" method="post" id="postDeletePost">
+                    @Html.AntiForgeryToken()
+                </form>
+            }
         </div>
     }
 </div>
 
 @section Scripts
 {
+    @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
+    {
+        <script>
+            $(document).ready(function() {
+                $(".btnDeletePost").click(function() {
+                    var btnId = this.id;
+                    var postId = btnId.replace('btnDelete-', '');
+
+                    swal({
+                            title: "Are you sure?",
+                            text: "This post will be deleted permanently!",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true
+                        })
+                        .then((willDelete) => {
+                            if (willDelete) {
+
+                                var input = $("<input>")
+                                    .attr("type", "hidden")
+                                    .attr("name", "postId").val(postId);
+                                $('#postDeletePost').append(input);
+                                $('#postDeletePost').submit();
+                            }
+                        });
+                });
+            });
+        </script>
+    }
+
+
     <script>
         $(document).ready(function() {
             $("#btnDeletePost").click(function(e) {
