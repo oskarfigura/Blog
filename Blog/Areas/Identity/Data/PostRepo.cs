@@ -55,22 +55,37 @@ namespace Blog.Areas.Identity.Data
 
         public async Task<Post> GetPublishedPostBySlug(string slug)
         {
-            var post = await _context.Posts.Where(p => p.Slug.Equals(slug) && p.IsPublished).ToListAsync();
+            var post = await _context.Posts
+                .Where(p => p.Slug.Equals(slug) && p.IsPublished).ToListAsync();
             return post.DefaultIfEmpty(new Post()).FirstOrDefault();
         }
 
-        public async Task<IEnumerable<Post>> GetPostsBySearchData(string searchData)
+        public async Task<IEnumerable<Post>> GetPostsBySearchData(PostManagerSearch searchData)
         {
             var postList = await GetAllPosts();
 
-            if (string.IsNullOrEmpty(searchData))
+            if (searchData == null) return postList;
+
+            if (!postList.Any()) return postList;
+
+            switch (searchData.PublishStatus)
             {
-                return postList;
+                case (int)PostManagerSearch.PublishStatusList.Any:
+                    break;
+                case (int)PostManagerSearch.PublishStatusList.Published:
+                    postList = postList.Where(p => p.IsPublished);
+                    break;
+                case (int)PostManagerSearch.PublishStatusList.Unpublished:
+                    postList = postList.Where(p => !p.IsPublished);
+                    break;
+                default:
+                    break;
             }
 
-            if (postList.Any())
+            if (!string.IsNullOrEmpty(searchData.PostTitle))
             {
-                postList = postList.Where(x => x.Title.Contains(searchData, StringComparison.OrdinalIgnoreCase));
+                postList = postList.Where(p => p.Title.Contains(searchData.PostTitle,
+                    StringComparison.OrdinalIgnoreCase));
             }
 
             return postList;
