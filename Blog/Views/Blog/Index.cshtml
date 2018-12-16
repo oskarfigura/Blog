@@ -1,7 +1,26 @@
-﻿
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@model BlogViewModel
 @{
     ViewData["Title"] = "Home";
 }
 
 <h2>@ViewData["Title"]</h2>
 
+@if (!@Model.BlogPosts.Any())
+{
+    <h2>This blog doesn't have any posts :(</h2>
+}
+
+
+
+@section Scripts {
+    @if (ViewData["PostDeleteResult"] != null)
+    {
+        <script>
+            $(document).ready(function() {
+                swal("@ViewData["PostDeleteResult"]", { icon: "info" });
+            });
+        </script>
+    }
+}
