@@ -26,6 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\Blog\Comments.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\PostManager\Post.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
