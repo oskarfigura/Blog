@@ -19,7 +19,7 @@ namespace Blog.Areas.Identity.Data
     {
         public static readonly string[] AdminUsers = {"Member1"};
 
-        public static readonly string[] EditorUsers = { };
+        public static readonly string[] EditorUsers = { "Editor1", "Editor2" };
 
         public static readonly string[] FollowerUsers =
         {
