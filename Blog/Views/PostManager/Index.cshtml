@@ -1,90 +1,159 @@
-﻿@model PostManagerViewModel
+﻿@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
+@model PostManagerViewModel
 
 @{
     ViewData["Title"] = "Post Manager";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<div class="container-fluid">
+    <div class="row">
+        <h2>@ViewData["Title"]</h2>
+        <hr/>
 
-<h2>@ViewData["Title"]</h2>
-<hr />
-@if (!Model.BlogPosts.Any())
-{
-    <h4>There are currently no posts.</h4>
-}
-
-<button type="button" onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
-        class="btn btn-success">
-    Create New Post
-</button>
-
-@if (Model.BlogPosts.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.BlogPosts.First().Title)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.BlogPosts.First().AuthorUserName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.BlogPosts.First().IsPublished)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.BlogPosts)
+        @if (!Model.BlogPosts.Any())
+        {
+            if (Model.SearchData != null)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Title)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.AuthorUserName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.IsPublished)
-                    </td>
-                    <td>
-                        @Html.ActionLink("View", "Post", new {slug = @item.Slug }) |
-                        @Html.ActionLink("Edit", "Edit", new { postId = @item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", new { postId = @item.Id })
-                    </td>
-                </tr>
+                <h4>Your search, did not match any posts.</h4>
+                <button type="button" onclick="location.href = '@Url.Action("Index", "PostManager")'"
+                        class="btn btn-primary">
+                    View all posts
+                </button>
             }
-        </tbody>
-    </table>
-}
+            else
+            {
+                <h4>There are currently no posts on this blog.</h4>
+            }
+            <button type="button" onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
+                    class="btn btn-success">
+                Create New Post
+            </button>
+        }
+    </div>
 
-@if (ViewData["PostManagerMessage"] != null)
-{
-    <!-- Modal -->
-    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModal" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">Message:</h2>
-                </div>
-                <div class="modal-body">
-                    <h3>@ViewData["PostManagerMessage"]</h3>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                </div>
+    @if (Model.BlogPosts.Any())
+    {
+        <div class="row">
+            <div class="form-group">
+                @using (Html.BeginForm("Index", "PostManager", FormMethod.Get))
+                {
+                    <div class="form-group">
+                        <label for="inputPostTitle">Find by post title:</label>
+
+                        @Html.TextBoxFor(m => m.SearchData.PostTitle, new
+                        {
+                            @class = "form-control", @id = "inputPostTitle", @placeholder = "Search by post title"
+                        })
+                    </div>
+                    <div class="form-group">
+                        <label>Filter posts by publish status: </label>
+                        <select asp-for="@Model.SearchData.PublishStatus"
+                                asp-items="Html.GetEnumSelectList<PostManagerSearch.PublishStatusList>()"
+                                class="form-control">
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="button" onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
+                            class="btn btn-success">
+                        Create New Post
+                    </button>
+                }
             </div>
         </div>
-    </div>
-}
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.BlogPosts.First().Title)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.BlogPosts.First().AuthorUserName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.BlogPosts.First().IsPublished)
+                        </th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var item in Model.BlogPosts)
+                    {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Title)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.AuthorUserName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.IsPublished)
+                            </td>
+                            <td>
+                                @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
+                                {
+                                    <form asp-controller="PostManager" asp-action="Delete" asp-route-postId="@item.Id"
+                                          method="post" id="postDeleteForm">
+                                        @Html.AntiForgeryToken()
+                                        <input id="btnDeletePost" type="submit" value="Delete"
+                                               class="btn btn-danger btn-xs pull-right"/>
+                                    </form>
+                                }
+
+                                @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded)
+                                {
+                                    <button type="button"
+                                            onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @item.Id})'"
+                                            class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
+                                        Edit
+                                    </button>
+                                }
+
+                                <button type="button"
+                                        onclick="location.href = '@Url.Action("Post", "PostManager", new {slug = @item.Slug})'"
+                                        class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
 
 @section Scripts
-    {
+{
     <script>
-        $(document).ready(function () {
-            $(function () {
-                $('#messageModal').modal('show');
+        $(document).ready(function() {
+            $("#btnDeletePost").click(function(e) {
+                e.preventDefault();
+
+                swal({
+                        title: "Are you sure?",
+                        text: "This post will be deleted permanently!",
+                        icon: "warning",
+                        buttons: true,
+                        dangerMode: true
+                    })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $('#postDeleteForm').submit();
+                        }
+                    });
             });
         });
     </script>
+    @if (ViewData["PostManagerMessage"] != null)
+    {
+        <script>
+            $(document).ready(function() {
+                swal("@ViewData["PostManagerMessage"]", { icon: "info" });
+            });
+        </script>
+    }
 }
