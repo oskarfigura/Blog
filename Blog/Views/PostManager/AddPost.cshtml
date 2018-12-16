@@ -46,25 +46,6 @@
             </div>
         </form>
     </div>
-    @if (ViewData["AddPostResult"] != null)
-    {
-        <!-- Modal -->
-        <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModal" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 class="modal-title">Message:</h2>
-                    </div>
-                    <div class="modal-body">
-                        <h3>@ViewData["AddPostResult"]</h3>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 </div>
 
 @section Scripts {
@@ -72,10 +53,6 @@
 
     <script>
         $(document).ready(function () {
-            $(function () {
-                $('#messageModal').modal('show');
-            });
-
             $(function() {
                 var postForm = $('.postForm');
                 var contentEditor = $('.summernote');
@@ -113,4 +90,12 @@
             });
         });
     </script>
+    @if (ViewData["AddPostResult"] != null)
+    {
+        <script>
+            $(document).ready(function() {
+                swal("@ViewData["AddPostResult"]", { icon: "info" });
+            });
+        </script>
+    }
 }
