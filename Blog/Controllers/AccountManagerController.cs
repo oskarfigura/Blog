@@ -13,7 +13,13 @@ namespace Blog.Controllers
         private const string TempDataOperationParam = "UserOperationResult";
         private const string ViewDataManagerMsgParam = "AccManagerMessage";
         private const string ViewDataEditResult = "EditResult";
-        private const string ViewDataDeleteResult = "DeleteResult";
+        private const string MsgUnexpectedError = "Something went wrong. Please try again.";
+        private const string MsgUserUpdated = "User updated successfully!";
+        private const string MsgUserDeleted = "User deleted successfully.";
+        private const string MsgDuplicateEmail = "Email already exists, please enter a different email.";
+
+        private const string MsgCannotDeleteYourself = "You cannot delete yourself from account manager! " +
+                                                       "Please do it in your profile settings.";
 
         private readonly IUserRepo _userRepo;
 
@@ -29,12 +35,14 @@ namespace Blog.Controllers
             //Get any result messages from CRUD operations on accounts
             if (TempData[TempDataOperationParam] != null)
             {
-                ViewData[ViewDataManagerMsgParam] = TempData[TempDataOperationParam].ToString();
+                ViewData[ViewDataManagerMsgParam] =
+                    TempData[TempDataOperationParam].ToString();
             }
 
             return View(new AccountManagerViewModel
             {
-                Accounts = await _userRepo.GetUsersBySearchData(accountManagerViewModel.AccountSearch),
+                Accounts = await _userRepo
+                    .GetUsersBySearchData(accountManagerViewModel.AccountSearch),
                 AvailableIdentityRoles = await _userRepo.GetAllRoles(),
                 AccountSearch = accountSearchData
             });
@@ -94,28 +102,26 @@ namespace Blog.Controllers
             //Populate available list of roles after form post cleared the list
             accountViewModel.AvailableIdentityRoles = await _userRepo.GetAllRoles();
 
-            if (accountViewModel.UserAccount != null)
+            if (accountViewModel.UserAccount == null)
             {
-                var emailIsUnique = await _userRepo
-                    .CheckIfEmailIsUnique(accountViewModel.UserAccount.Email,
-                    accountViewModel.UserAccount.Id);
-
-                if (emailIsUnique)
-                {
-                    ViewData[ViewDataEditResult] = "User updated successfully!";
-                    var result = await _userRepo.UpdateUser(accountViewModel.UserAccount);
-                    if (!result)
-                    {
-                        ViewData[ViewDataEditResult] = "Please try again.";
-                    }
-
-                    return View(accountViewModel);
-                }
-
-                ViewData[ViewDataEditResult] = "Email already exists, please enter a different email.";
+                ViewData[ViewDataEditResult] = MsgUnexpectedError;
                 return View(accountViewModel);
             }
-            ViewData[ViewDataEditResult] = "Please try again.";
+
+            var emailIsUnique = await _userRepo
+                .CheckIfEmailIsUnique(accountViewModel.UserAccount.Email,
+                    accountViewModel.UserAccount.Id);
+
+            if (!emailIsUnique)
+            {
+                ViewData[ViewDataEditResult] = MsgDuplicateEmail;
+                return View(accountViewModel);
+            }
+
+            ViewData[ViewDataEditResult] = MsgUserUpdated;
+            var result = await _userRepo.UpdateUser(accountViewModel.UserAccount);
+            if (!result) ViewData[ViewDataEditResult] = MsgUnexpectedError;
+
             return View(accountViewModel);
         }
 
@@ -125,13 +131,11 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(string userName)
         {
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepo.GetUserById(currentUserId);
+            var user = await GetLoggedInUser();
 
             if (userName.Equals(user.UserName))
             {
-                TempData[TempDataOperationParam] = "You cannot delete yourself from account manager! " +
-                                                    "Please do it in your profile settings.";
+                TempData[TempDataOperationParam] = MsgCannotDeleteYourself;
                 return RedirectToAction("Index");
             }
 
@@ -139,12 +143,19 @@ namespace Blog.Controllers
 
             if (deleteResult)
             {
-                TempData[TempDataOperationParam] = "User deleted successfully.";
+                TempData[TempDataOperationParam] = MsgUserDeleted;
                 return RedirectToAction("Index");
             }
 
-            TempData[TempDataOperationParam] = "Unexpected error occurred! Please try again.";
+            TempData[TempDataOperationParam] = MsgUnexpectedError;
             return RedirectToAction("Index");
+        }
+
+        private async Task<User> GetLoggedInUser()
+        {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepo.GetUserById(currentUserId);
+            return user;
         }
     }
 }
