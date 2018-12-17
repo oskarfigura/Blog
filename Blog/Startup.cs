@@ -50,7 +50,7 @@ namespace Blog
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("CanComment", policy => policy.RequireClaim("CanComment", "true"));
-                options.AddPolicy("CanDeleteComment", policy => policy.RequireClaim("CanDeleteComment", "true"));
+                options.AddPolicy("CanDeleteComments", policy => policy.RequireClaim("CanDeleteComments", "true"));
                 options.AddPolicy("CanEditPosts", policy => policy.RequireClaim("CanEditPosts", "true"));
                 options.AddPolicy("CanCreatePosts", policy => policy.RequireClaim("CanCreatePosts", "true"));
                 options.AddPolicy("CanDeletePosts", policy => policy.RequireClaim("CanDeletePosts", "true"));
