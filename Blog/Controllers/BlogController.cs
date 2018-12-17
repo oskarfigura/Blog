@@ -15,7 +15,8 @@ namespace Blog.Controllers
     {
         private const string TempDataOperationParam = "PostOperationResult";
         private const string MsgSomethingIsWrong = "Something went wrong. Please try again.";
-
+        private const string MsgPostDeleted = "Post deleted successfully.";
+        private const string CommentsSection = "#comments";
 
         private readonly IPostRepo _postRepo;
         private readonly IUserRepo _userRepo;
@@ -26,6 +27,7 @@ namespace Blog.Controllers
             _userRepo = userRepo;
         }
 
+        // GET: Blog/, view with all published posts
         public async Task<IActionResult> Index()
         {
             var posts = await _postRepo.GetAllPublishedPosts();
@@ -36,6 +38,7 @@ namespace Blog.Controllers
             });
         }
 
+        // GET: Blog/Post, view with post from slug (only published)
         [ActionName("Post")]
         [Route("/Blog/Post/{slug?}")]
         public async Task<IActionResult> Post(string slug)
@@ -55,6 +58,7 @@ namespace Blog.Controllers
             return View(CreatePostViewModel(post));
         }
 
+        // GET: Blog/AnyPost, view with post from slug (published or unpublished)
         [Authorize(Policy = "CanAccessPostManager")]
         [ActionName("Post")]
         [Route("/Blog/AnyPost/{slug?}")]
@@ -75,21 +79,6 @@ namespace Blog.Controllers
             return View(CreatePostViewModel(post));
         }
 
-        private static PostViewModel CreatePostViewModel(Post post)
-        {
-            post.Content = BlogUtils.FormatPostContent(post.Content);
-
-            return (new PostViewModel()
-            {
-                Id = post.Id,
-                Title = post.Title,
-                Content = post.Content,
-                PubDate = post.PubDate,
-                Comments = post.Comments,
-                Slug = post.Slug
-            });
-        }
-
         // POST: Blog/Delete, process deleting a post
         [Authorize(Policy = "CanDeletePosts")]
         [HttpPost, ActionName("Delete")]
@@ -101,7 +90,7 @@ namespace Blog.Controllers
             TempData[TempDataOperationParam] = MsgSomethingIsWrong;
             if (!deleteResult) return RedirectToAction("Index", "PostManager");
 
-            TempData[TempDataOperationParam] = "Post deleted successfully.";
+            TempData[TempDataOperationParam] = MsgPostDeleted;
             return RedirectToAction("Index", "PostManager");
         }
 
@@ -118,7 +107,7 @@ namespace Blog.Controllers
 
             if (result != null)
             {
-                return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
+                return Redirect(Url.Action("Post", new { slug = postSlug }) + CommentsSection);
             }
 
             return RedirectToAction("Post", new { slug = postSlug });
@@ -136,7 +125,22 @@ namespace Blog.Controllers
             }
 
             await _postRepo.DeleteComment(commentId);
-            return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
+            return Redirect(Url.Action("Post", new { slug = postSlug }) + CommentsSection);
+        }
+
+        private static PostViewModel CreatePostViewModel(Post post)
+        {
+            post.Content = BlogUtils.FormatPostContent(post.Content);
+
+            return (new PostViewModel()
+            {
+                Id = post.Id,
+                Title = post.Title,
+                Content = post.Content,
+                PubDate = post.PubDate,
+                Comments = post.Comments,
+                Slug = post.Slug
+            });
         }
     }
 }

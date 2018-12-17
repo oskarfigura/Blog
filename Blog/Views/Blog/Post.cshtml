@@ -33,8 +33,7 @@
         @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
         {
             <form asp-controller="Blog" asp-action="Delete" asp-route-postId="@Model.Id"
-                  method="post" id="postDeleteForm">
-                @Html.AntiForgeryToken()
+                  method="post" id="postDeleteForm" asp-antiforgery="true">
                 <input id="btnDeletePost" type="submit" value="Delete Post"
                        class="btn btn-danger btn-xs pull-left" />
             </form>
