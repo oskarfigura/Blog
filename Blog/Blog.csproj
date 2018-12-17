@@ -9,6 +9,8 @@
     <Compile Remove="Migrations\20181208175849_CreateIdentitySchema.Designer.cs" />
     <Compile Remove="Migrations\20181214220842_updatedPostDateFormat.cs" />
     <Compile Remove="Migrations\20181214220842_updatedPostDateFormat.Designer.cs" />
+    <Compile Remove="Migrations\20181217232542_test.cs" />
+    <Compile Remove="Migrations\20181217232542_test.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,7 +20,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.3" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
   </ItemGroup>
 
