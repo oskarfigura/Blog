@@ -13,7 +13,7 @@ namespace Blog.Areas.Identity.Data
     public class PostRepo : IPostRepo
     {
         private readonly BlogContext _context;
-        private bool _disposed = false;
+        private bool _disposed;
 
         public PostRepo(BlogContext context)
         {
