@@ -18,22 +18,26 @@
     {
         <div class="row">
             <div class="form-group">
-                @using (Html.BeginForm("Index", "AccountManager", FormMethod.Get, new {id = "searchForm"}))
+                @using (Html.BeginForm("Index", "AccountManager", 
+                    FormMethod.Get, new {id = "searchForm"}))
                 {
                     <div class="form-group">
                         <label for="inputSearchUserName">Find by username:</label>
 
                         @Html.TextBoxFor(m => m.AccountSearch.UserName, new
-                        {
-                            @class = "form-control", @id = "inputSearchUserName", @placeholder = "Search by username"
-                        })
+                   {
+                       @class = "form-control", @id = "inputSearchUserName",
+                       @placeholder = "Search by username"
+                   })
                     </div>
 
                     <div class="form-group">
                         <label for="filterByRole">Filter by role:</label>
 
-                        @Html.DropDownListFor(m => m.AccountSearch.Role, Model.AvailableIdentityRoles.Select(item => new SelectListItem
-                        {Value = item.Name.ToString(), Text = item.Name.ToString(),}), "All Roles", new {@class = "form-control", @id = "filterByRole"})
+                        @Html.DropDownListFor(m => m.AccountSearch.Role, 
+                            Model.AvailableIdentityRoles.Select(item => new SelectListItem
+                        {Value = item.Name.ToString(), Text = item.Name.ToString(),}), 
+                            "All Roles", new {@class = "form-control", @id = "filterByRole"})
 
                     </div>
                     <button type="submit" class="btn btn-primary">Search</button>
@@ -84,26 +88,23 @@
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteUsers")).Succeeded)
                                 {
                                     <button type="button" id="btnDelete-@user.UserName" style="margin-right: 5px"
-                                            class="btn btn-danger btn-xs pull-right btnDeleteUser">
-                                        Delete
+                                            class="btn btn-danger btn-xs pull-right btnDeleteUser">Delete
                                     </button>
                                 }
 
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditUsers")).Succeeded)
                                 {
-                                    <button type="button"
+                                    <button type="button" class="btn btn-primary btn-xs pull-right"
                                             onclick="location.href = '@Url.Action("Edit", "AccountManager",
                                                                           new {userName = user.UserName})'"
-                                            class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
-                                        Edit
+                                             style="margin-right: 5px">Edit
                                     </button>
                                 }
 
-                                <button type="button"
+                                <button type="button" class="btn btn-primary btn-xs pull-right"
                                         onclick="location.href = '@Url.Action("Details", "AccountManager",
                                                                       new {userName = user.UserName})'"
-                                        class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
-                                    View
+                                         style="margin-right: 5px">View
                                 </button>
                             </td>
                         </tr>
@@ -112,8 +113,8 @@
             </div>
             @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteUsers")).Succeeded)
             {
-                <form asp-controller="AccountManager" asp-action="Delete" method="post" id="postDeleteUser">
-                    @Html.AntiForgeryToken()
+                <form asp-controller="AccountManager" asp-action="Delete" 
+                      method="post" id="postDeleteUser" asp-antiforgery="true">
                 </form>
             }
         </div>
