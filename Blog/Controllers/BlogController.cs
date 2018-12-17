@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
 using Blog.Models;
@@ -15,13 +16,14 @@ namespace Blog.Controllers
         private const string TempDataOperationParam = "BlogOperationResult";
         private const string ViewDataEditPostResult = "EditPostResult";
         private const string ViewDataPostDeleteResultMsg = "PostDeleteResult";
-        private const string ViewDataPostResultMsg = "PostResultMsg";
 
         private readonly IPostRepo _postRepo;
+        private readonly IUserRepo _userRepo;
 
-        public BlogController(IPostRepo postRepo)
+        public BlogController(IPostRepo postRepo, IUserRepo userRepo)
         {
             _postRepo = postRepo;
+            _userRepo = userRepo;
         }
 
         public async Task<IActionResult> Index()
@@ -68,10 +70,11 @@ namespace Blog.Controllers
                 Title = post.Title,
                 Content = formattedContent,
                 PubDate = post.PubDate,
-                Comments = post.Comments
+                Comments = post.Comments,
+                Slug = post.Slug
             });
         }
-        // GET: PostManager/Edit, view for editing a post
+        // GET: Blog/Edit, view for editing a post
         [Authorize(Policy = "CanEditPosts")]
         public async Task<IActionResult> Edit(string postId)
         {
@@ -98,7 +101,7 @@ namespace Blog.Controllers
             });
         }
 
-        // POST: PostManager/Edit, process a change of post data
+        // POST: Blog/Edit, process a change of post data
         [Authorize(Policy = "CanEditPosts")]
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
@@ -136,7 +139,7 @@ namespace Blog.Controllers
             return View(postEditViewModel);
         }
 
-        // POST: PostManager/Delete, process deleting a post
+        // POST: Blog/Delete, process deleting a post
         [Authorize(Policy = "CanDeletePosts")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -150,8 +153,27 @@ namespace Blog.Controllers
             return RedirectToAction("Index");
         }
 
-        // POST: PostManager/Delete, process deleting a comment
-        [Authorize(Policy = "CanDeleteComment")]
+        // POST: Blog/AddComment, process adding a comment
+        [Authorize(Policy = "CanComment")]
+        [HttpPost, ActionName("AddComment")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(string comment, string postId, string postSlug)
+        {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepo.GetUserById(currentUserId);
+            var post = await _postRepo.GetPostById(postId);
+            var result = await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
+
+            if (result != null)
+            {
+                return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
+            }
+
+            return RedirectToAction("Post", new { slug = postSlug });
+        }
+
+        // POST: Blog/Delete, process deleting a comment
+        [Authorize(Policy = "CanDeleteComments")]
         [HttpPost, ActionName("DeleteComment")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteComment(string commentId, string postSlug)
@@ -161,14 +183,9 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            //var comment = await _postRepo.GetCommentById(commentId);
+            var result = await _postRepo.DeleteComment(commentId);
 
-            //            if (string.IsNullOrEmpty(comment.Id))
-            //            {
-            //                return NotFound();
-            //            }
-
-            return RedirectToAction("Post", new { postSlug });
+            return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
         }
     }
 }

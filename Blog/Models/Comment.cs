@@ -15,11 +15,9 @@ namespace Blog.Models
         [Required]
         public string PostId { get; set; }
 
-        //Only used to track which account was used when posting
         [Required]
         public string AuthorId { get; set; }
 
-        //Used in cases when the user deletes their account
         [Required]
         public string AuthorDisplayName { get; set; }
 

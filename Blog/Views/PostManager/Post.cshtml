@@ -7,9 +7,14 @@
 }
 
 <div class="container container-fluid">
-    <div class="col-md-12">
+    <div class="row">
         <h2>@Model.Title</h2>
-        <h5>Published @Model.PubDate</h5>
+        <h5>Published @Model.PubDate by @Model.Author</h5>
+
+        @if (@Model.EditDate != DateTime.MinValue)
+        {
+            <h5>Edited on @Model.EditDate</h5>
+        }
 
         @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded)
         {
@@ -23,41 +28,42 @@
         @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
         {
             <form asp-controller="PostManager" asp-action="Delete" asp-route-postId="@Model.Id"
-                  method="post" id="postDeleteForm">
-                @Html.AntiForgeryToken()
+                  method="post" id="postDeleteForm" asp-antiforgery="true">
                 <input id="btnDeletePost" type="submit" value="Delete Post"
-                       class="btn btn-danger btn-xs pull-left"/>
+                       class="btn btn-danger btn-xs pull-left" />
             </form>
         }
         <div class="clearfix"></div>
-        <hr/>
+        <hr />
 
         @Html.Raw(Model.Content)
     </div>
 
-    <div class="col-md-12">
-        <hr/>
-        <h2>Leave a comment</h2>
-        <form asp-action="">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control"/>
-                <span asp-validation-for="Title" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <textarea asp-for="Content" id="textEditor" class="form-control" 
-                    style="resize: vertical;" rows="5">
+    <div class="row">
+        <hr />
+        @if ((await AuthorizationService.AuthorizeAsync(User, "CanComment")).Succeeded)
+        {
+            <h2>Leave a comment</h2>
+            <form asp-controller="PostManager" asp-action="AddComment" asp-antiforgery="true"
+                  asp-route-postId="@Model.Id" asp-route-postSlug="@Model.Slug">
+                <div class="form-group">
+                    <textarea asp-for="Comment" class="form-control"
+                              style="resize: vertical;" rows="5">
                 </textarea>
-                <span asp-validation-for="Content" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Submit" class="btn btn-success"/>
-            </div>
-        </form>
-        <hr/>
-
+                    <span asp-validation-for="Comment" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Add Comment" class="btn btn-success" />
+                </div>
+            </form>
+            <hr />
+        }
+        else
+        {
+            <h3>Please log in to post comments</h3>
+        }
+    </div>
+    <div class="row">
         @{
             await Html.RenderPartialAsync("Comments");
         }
@@ -65,18 +71,19 @@
 </div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        $(document).ready(function() {
-            $("#btnDeletePost").click(function(e) {
+        $(document).ready(function () {
+            $("#btnDeletePost").click(function (e) {
                 e.preventDefault();
 
                 swal({
-                        title: "Are you sure?",
-                        text: "This post will be deleted permanently!",
-                        icon: "warning",
-                        buttons: true,
-                        dangerMode: true
-                    })
+                    title: "Are you sure?",
+                    text: "This post will be deleted permanently!",
+                    icon: "warning",
+                    buttons: true,
+                    dangerMode: true
+                })
                     .then((willDelete) => {
                         if (willDelete) {
                             $('#postDeleteForm').submit();
@@ -90,6 +97,39 @@
         <script>
             $(document).ready(function() {
                 swal("@ViewData["PostResultMsg"]", { icon: "info" });
+            });
+        </script>
+    }
+    @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteComments")).Succeeded)
+    {
+        <script>
+            $(document).ready(function() {
+                $(".btnDeleteComment").click(function() {
+                    var btnId = this.id;
+                    var commentId = btnId.replace('btnDelete-', '');
+                    var postSlug = '@Model.Slug';
+                    swal({
+                            title: "Are you sure?",
+                            text: "This comment will be deleted permanently!",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true
+                        })
+                        .then((willDelete) => {
+                            if (willDelete) {
+
+                                var inputCommentId = $("<input>")
+                                    .attr("type", "hidden")
+                                    .attr("name", "commentId").val(commentId);
+                                var inputSlug = $("<input>")
+                                    .attr("type", "hidden")
+                                    .attr("name", "postSlug").val(postSlug);
+                                $('#deleteCommentForm').append(inputCommentId);
+                                $('#deleteCommentForm').append(inputSlug);
+                                $('#deleteCommentForm').submit();
+                            }
+                        });
+                });
             });
         </script>
     }

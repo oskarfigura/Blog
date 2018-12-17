@@ -48,6 +48,6 @@ namespace Blog.Models
         [Display(Name = "Published")]
         public bool IsPublished { get; set; }
 
-        public IEnumerable<Comment> Comments { get; set; } = new List<Comment>();
+        public ICollection<Comment> Comments { get; set; }
     }
 }

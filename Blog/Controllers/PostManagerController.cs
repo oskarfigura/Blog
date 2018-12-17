@@ -84,7 +84,10 @@ namespace Blog.Controllers
                 Title = post.Title,
                 Content = formattedContent,
                 PubDate = post.PubDate,
-                Comments = post.Comments
+                Comments = post.Comments,
+                Slug = post.Slug,
+                Author = post.AuthorUserName,
+                EditDate = post.EditDate
             });
         }
 
@@ -232,8 +235,27 @@ namespace Blog.Controllers
             return RedirectToAction("Index");
         }
 
+        // POST: PostManager/AddComment, process adding a comment
+        [Authorize(Policy = "CanComment")]
+        [HttpPost, ActionName("AddComment")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddComment(string comment, string postId, string postSlug)
+        {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepo.GetUserById(currentUserId);
+            var post = await _postRepo.GetPostById(postId);
+            var result = await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
+
+            if (result != null)
+            {
+                return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
+            }
+
+            return RedirectToAction("Post", new { slug = postSlug });
+        }
+
         // POST: PostManager/Delete, process deleting a comment
-        [Authorize(Policy = "CanDeleteComment")]
+        [Authorize(Policy = "CanDeleteComments")]
         [HttpPost, ActionName("DeleteComment")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteComment(string commentId, string postSlug)
@@ -243,14 +265,9 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            //var comment = await _postRepo.GetCommentById(commentId);
+            var result = await _postRepo.DeleteComment(commentId);
 
-//            if (string.IsNullOrEmpty(comment.Id))
-//            {
-//                return NotFound();
-//            }
-
-            return RedirectToAction("Post", new {postSlug});
+            return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
         }
     }
 }
