@@ -32,10 +32,7 @@ namespace Blog.Controllers
         {
             var posts = await _postRepo.GetAllPublishedPosts();
 
-            return View(new BlogViewModel()
-            {
-                BlogPosts = posts
-            });
+            return View(CreateBlogViewModel(posts));
         }
 
         // GET: Blog/Post, view with post from slug (only published)
@@ -100,8 +97,7 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddComment(string comment, string postId, string postSlug)
         {
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepo.GetUserById(currentUserId);
+            var user = await GetLoggedInUser();
             var post = await _postRepo.GetPostById(postId);
             var result = await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
 
@@ -138,9 +134,24 @@ namespace Blog.Controllers
                 Title = post.Title,
                 Content = post.Content,
                 PubDate = post.PubDate,
-                Comments = post.Comments,
+                Comments = post.Comments.OrderByDescending(c => c.PubDate),
                 Slug = post.Slug
             });
+        }
+
+        private static BlogViewModel CreateBlogViewModel(IEnumerable<Post> posts)
+        {
+            return (new BlogViewModel()
+            {
+                BlogPosts = posts.OrderByDescending(p => p.PubDate)
+            });
+        }
+
+        private async Task<User> GetLoggedInUser()
+        {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepo.GetUserById(currentUserId);
+            return user;
         }
     }
 }
