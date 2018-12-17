@@ -21,10 +21,6 @@ namespace Blog.Controllers
     {
         private const string TempDataOperationParam = "PostOperationResult";
         private const string ViewDataManagerMsgParam = "PostManagerMessage";
-        private const string ViewDataAddPostResult = "AddPostResult";
-        private const string ViewDataEditPostResult = "EditPostResult";
-        private const string ViewDataDeletePostResult = "DeletePostResult";
-        private const string ViewDataPostResultMsg = "PostResultMsg";
         private const string MsgSomethingIsWrong = "Something went wrong. Please try again.";
 
         private readonly IPostRepo _postRepo;
@@ -53,41 +49,6 @@ namespace Blog.Controllers
             {
                 BlogPosts = await _postRepo.GetPostsBySearchData(postSearchData),
                 SearchData = postSearchData
-            });
-        }
-
-        [Route("/PostManager/ViewPost/{slug?}")]
-        public async Task<IActionResult> Post(string slug)
-        {
-            if (string.IsNullOrEmpty(slug))
-            {
-                return NotFound();
-            }
-
-            var post = await _postRepo.GetPostBySlug(slug);
-
-            if (string.IsNullOrEmpty(post.Id))
-            {
-                return NotFound();
-            }
-
-            if (string.IsNullOrEmpty(post.Content))
-            {
-                return NotFound();
-            }
-
-            var formattedContent = BlogUtils.FormatPostContent(post.Content);
-
-            return View(new PostViewModel()
-            {
-                Id = post.Id,
-                Title = post.Title,
-                Content = formattedContent,
-                PubDate = post.PubDate,
-                Comments = post.Comments,
-                Slug = post.Slug,
-                Author = post.AuthorUserName,
-                EditDate = post.EditDate
             });
         }
 
@@ -126,7 +87,7 @@ namespace Blog.Controllers
 
             if (string.IsNullOrEmpty(slug))
             {
-                ViewData[ViewDataEditPostResult] =
+                ViewData[ViewDataManagerMsgParam] =
                     "Slug contains reserved characters, please only use letters and spaces.";
                 return View(createPostViewModel);
             }
@@ -135,7 +96,7 @@ namespace Blog.Controllers
 
             if (!slugIsUnique)
             {
-                ViewData[ViewDataAddPostResult] = "Slug already exists, please enter a different slug.";
+                ViewData[ViewDataManagerMsgParam] = "Slug already exists, please enter a different slug.";
                 return View(createPostViewModel);
             }
 
@@ -151,7 +112,7 @@ namespace Blog.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewData[ViewDataAddPostResult] = MsgSomethingIsWrong;
+            ViewData[ViewDataManagerMsgParam] = MsgSomethingIsWrong;
             return View(createPostViewModel);
         }
 
@@ -197,7 +158,7 @@ namespace Blog.Controllers
 
             if (string.IsNullOrEmpty(slug))
             {
-                ViewData[ViewDataEditPostResult] =
+                ViewData[ViewDataManagerMsgParam] =
                     "Slug contains reserved characters, please only use letters and spaces.";
                 return View(postEditViewModel);
             }
@@ -210,14 +171,14 @@ namespace Blog.Controllers
 
                 if (!updateResult)
                 {
-                    ViewData[ViewDataEditPostResult] = "Unable to edit post. Please try again.";
+                    ViewData[ViewDataManagerMsgParam] = "Unable to edit post. Please try again.";
                 }
 
-                ViewData[ViewDataEditPostResult] = "Post updated successfully.";
+                ViewData[ViewDataManagerMsgParam] = "Post updated successfully.";
                 return View(postEditViewModel);
             }
 
-            ViewData[ViewDataEditPostResult] = "Slug already exists, please enter a different slug.";
+            ViewData[ViewDataManagerMsgParam] = "Slug already exists, please enter a different slug.";
             return View(postEditViewModel);
         }
 
@@ -233,41 +194,6 @@ namespace Blog.Controllers
 
             TempData[TempDataOperationParam] = "Post deleted successfully.";
             return RedirectToAction("Index");
-        }
-
-        // POST: PostManager/AddComment, process adding a comment
-        [Authorize(Policy = "CanComment")]
-        [HttpPost, ActionName("AddComment")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddComment(string comment, string postId, string postSlug)
-        {
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepo.GetUserById(currentUserId);
-            var post = await _postRepo.GetPostById(postId);
-            var result = await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
-
-            if (result != null)
-            {
-                return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
-            }
-
-            return RedirectToAction("Post", new { slug = postSlug });
-        }
-
-        // POST: PostManager/Delete, process deleting a comment
-        [Authorize(Policy = "CanDeleteComments")]
-        [HttpPost, ActionName("DeleteComment")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteComment(string commentId, string postSlug)
-        {
-            if (string.IsNullOrEmpty(commentId))
-            {
-                return NotFound();
-            }
-
-            var result = await _postRepo.DeleteComment(commentId);
-
-            return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
         }
     }
 }

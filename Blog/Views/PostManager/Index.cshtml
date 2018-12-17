@@ -101,21 +101,22 @@
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
                                 {
                                     <button type="button" id="btnDelete-@item.Id" style="margin-right: 5px"
-                                            class="btn btn-danger btn-xs pull-right btnDeletePost" >Delete
+                                            class="btn btn-danger btn-xs pull-right btnDeletePost">
+                                        Delete
                                     </button>
                                 }
 
-                                @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded)
-                                {
-                                    <button type="button"
-                                            onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @item.Id})'"
-                                            class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
-                                        Edit
-                                    </button>
-                                }
+@*                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded) *@
+@*                                 { *@
+@*                                     <button type="button" *@
+@*                                             onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @item.Id})'" *@
+@*                                             class="btn btn-primary btn-xs pull-right" style="margin-right: 5px"> *@
+@*                                         Edit *@
+@*                                     </button> *@
+@*                                 } *@
 
                                 <button type="button"
-                                        onclick="location.href = '@Url.Action("Post", "PostManager", new {slug = @item.Slug})'"
+                                        onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @item.Slug})'"
                                         class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
                                     View
                                 </button>

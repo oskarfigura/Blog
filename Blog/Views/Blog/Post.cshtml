@@ -11,11 +11,20 @@
     <div class="row">
         <h2>@Model.Title</h2>
         <h5>Published @Model.PubDate</h5>
+        
+        @if ((await AuthorizationService.AuthorizeAsync(User, "CanAccessPostManager")).Succeeded)
+        {
+            <button type="button"
+                    onclick="location.href = '@Url.Action("Index", "PostManager", new {})'"
+                    class="btn btn-default btn-xs pull-left" style="margin-right: 5px">
+                Post Manager
+            </button>
+        }
 
         @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded)
         {
             <button type="button"
-                    onclick="location.href = '@Url.Action("Edit", "Blog", new {postId = @Model.Id})'"
+                    onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @Model.Id})'"
                     class="btn btn-primary btn-xs pull-left" style="margin-right: 5px">
                 Edit Post
             </button>
@@ -27,11 +36,11 @@
                   method="post" id="postDeleteForm">
                 @Html.AntiForgeryToken()
                 <input id="btnDeletePost" type="submit" value="Delete Post"
-                       class="btn btn-danger btn-xs pull-left"/>
+                       class="btn btn-danger btn-xs pull-left" />
             </form>
         }
         <div class="clearfix"></div>
-        <hr/>
+        <hr />
 
         @Html.Raw(Model.Content)
     </div>
@@ -89,14 +98,6 @@
             });
         });
     </script>
-    @if (ViewData["PostResultMsg"] != null)
-    {
-        <script>
-            $(document).ready(function() {
-                swal("@ViewData["PostResultMsg"]", { icon: "info" });
-            });
-        </script>
-    }
     @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteComments")).Succeeded)
     {
         <script>
