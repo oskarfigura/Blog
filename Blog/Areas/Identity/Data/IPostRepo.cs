@@ -19,5 +19,7 @@ namespace Blog.Areas.Identity.Data
         Task<bool> UpdatePost(PostEditViewModel postEditViewModel);
         Task<bool> CheckIfSlugIsUnique(string slug, string postId);
         Task<bool> CheckIfSlugIsUnique(string slug);
+        Task<string> AddComment(Comment comment);
+        Task<bool> DeleteComment(string id);
     }
 }

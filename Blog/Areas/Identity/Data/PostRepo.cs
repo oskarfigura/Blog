@@ -35,34 +35,48 @@ namespace Blog.Areas.Identity.Data
             }
         }
 
+        public async Task<string> AddComment(Comment comment)
+        {
+            if (string.IsNullOrEmpty(comment.Content)) return null;
+
+            await _context.Comments.AddAsync(comment);
+            await _context.SaveChangesAsync();
+            return comment.Id;
+        }
+
         public async Task<IEnumerable<Post>> GetAllPosts()
         {
-            var postList = await _context.Posts.ToListAsync();
+            var postList = await _context.Posts.AsNoTracking()
+                .Include(p => p.Comments).ToListAsync();
             return postList ?? new List<Post>();
         }
 
         public async Task<IEnumerable<Post>> GetAllPublishedPosts()
         {
-            var postList = await _context.Posts.Where(p => p.IsPublished).ToListAsync();
+            var postList = await _context.Posts.Where(p => p.IsPublished).AsNoTracking()
+                .Include(p => p.Comments).ToListAsync();
             return postList ?? new List<Post>();
         }
 
         public async Task<Post> GetPostById(string postId)
         {
-            var post = await _context.Posts.Where(p => p.Id.Equals(postId)).ToListAsync();
+            var post = await _context.Posts.Where(p => p.Id.Equals(postId)).AsNoTracking()
+                .Include(p => p.Comments).ToListAsync();
             return post.DefaultIfEmpty(new Post()).FirstOrDefault();
         }
 
         public async Task<Post> GetPostBySlug(string slug)
         {
-            var post = await _context.Posts.Where(p => p.Slug.Equals(slug)).ToListAsync();
+            var post = await _context.Posts.Where(p => p.Slug.Equals(slug)).AsNoTracking()
+                .Include(p => p.Comments).ToListAsync();
             return post.DefaultIfEmpty(new Post()).FirstOrDefault();
         }
 
         public async Task<Post> GetPublishedPostBySlug(string slug)
         {
             var post = await _context.Posts
-                .Where(p => p.Slug.Equals(slug) && p.IsPublished).ToListAsync();
+                .Where(p => p.Slug.Equals(slug) && p.IsPublished).AsNoTracking()
+                .Include(p => p.Comments).ToListAsync();
             return post.DefaultIfEmpty(new Post()).FirstOrDefault();
         }
 
@@ -115,6 +129,32 @@ namespace Blog.Areas.Identity.Data
             {
                 return false;
             }
+        }
+
+        public async Task<bool> DeleteComment(string id)
+        {
+            try
+            {
+                var comment = await GetCommentById(id);
+                if (string.IsNullOrEmpty(comment.Id))
+                {
+                    return false;
+                }
+
+                _context.Comments.Remove(comment);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<Comment> GetCommentById(string id)
+        {
+            var comment = await _context.Comments.Where(c => c.Id.Equals(id)).ToListAsync();
+            return comment.DefaultIfEmpty(new Comment()).FirstOrDefault();
         }
 
         public async Task<bool> UpdatePost(PostEditViewModel postEditViewModel)
@@ -203,5 +243,6 @@ namespace Blog.Areas.Identity.Data
                 AuthorId = author.Id
             };
         }
+
     }
 }
