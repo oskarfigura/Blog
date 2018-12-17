@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Blog.Areas.Identity.Data;
+using Blog.Models;
 
 namespace Blog.Utils
 {
@@ -38,6 +40,18 @@ namespace Blog.Utils
             slug = RemoveRepeatedHyphens(slug);
 
             return slug.ToLowerInvariant();
+        }
+
+        public static Comment CreateComment(BlogUser user, string content, Post post)
+        {
+            return new Comment()
+            {
+                AuthorId = user.Id,
+                AuthorDisplayName = user.DisplayName,
+                Content = content,
+                PubDate = DateTime.Now,
+                PostId = post.Id
+            };
         }
 
         /**
