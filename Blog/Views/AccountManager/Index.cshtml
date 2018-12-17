@@ -9,41 +9,42 @@
     <div class="row">
         <h2>@ViewData["Title"]</h2>
         <hr/>
-        @if (!Model.Accounts.Any())
-        {
-            <h4>Unable to display a list of registered accounts.</h4>
-        }
     </div>
+
+    <div class="row">
+        <div class="form-group">
+            @using (Html.BeginForm("Index", "AccountManager", 
+                FormMethod.Get, new {id = "searchForm"}))
+            {
+                <div class="form-group">
+                    <label for="inputSearchUserName">Find by username:</label>
+
+                    @Html.TextBoxFor(m => m.AccountSearch.UserName, new
+                    {
+                        @class = "form-control", @id = "inputSearchUserName",
+                        @placeholder = "Search by username"
+                    })
+                </div>
+
+                <div class="form-group">
+                    <label for="filterByRole">Filter by role:</label>
+
+                    @Html.DropDownListFor(m => m.AccountSearch.Role, 
+                        Model.AvailableIdentityRoles.Select(item => new SelectListItem
+                        {Value = item.Name.ToString(), Text = item.Name.ToString(),}), 
+                        "All Roles", new {@class = "form-control", @id = "filterByRole"})
+
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            }
+        </div>
+    </div>
+    @if (!Model.Accounts.Any())
+    {
+        <h4>No accounts found.</h4>
+    }
     @if (Model.Accounts.Any())
     {
-        <div class="row">
-            <div class="form-group">
-                @using (Html.BeginForm("Index", "AccountManager", 
-                    FormMethod.Get, new {id = "searchForm"}))
-                {
-                    <div class="form-group">
-                        <label for="inputSearchUserName">Find by username:</label>
-
-                        @Html.TextBoxFor(m => m.AccountSearch.UserName, new
-                   {
-                       @class = "form-control", @id = "inputSearchUserName",
-                       @placeholder = "Search by username"
-                   })
-                    </div>
-
-                    <div class="form-group">
-                        <label for="filterByRole">Filter by role:</label>
-
-                        @Html.DropDownListFor(m => m.AccountSearch.Role, 
-                            Model.AvailableIdentityRoles.Select(item => new SelectListItem
-                        {Value = item.Name.ToString(), Text = item.Name.ToString(),}), 
-                            "All Roles", new {@class = "form-control", @id = "filterByRole"})
-
-                    </div>
-                    <button type="submit" class="btn btn-primary">Search</button>
-                }
-            </div>
-        </div>
         <div class="row">
             <div class="table-responsive">
                 <table class="table">
