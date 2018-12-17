@@ -5,9 +5,9 @@
 }
 
 <h2>@ViewData["Title"]</h2>
-<h3>@ViewData["Message"]</h3>
-<hr />
-<div class="container">
+
+<hr/>
+<div class="container-fluid">
     <div class="row">
         <dl class="dl-horizontal">
             <dt>
@@ -25,7 +25,7 @@
             </dd>
 
             <dt>
-                User Name
+                Username
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.UserAccount.UserName)
@@ -67,6 +67,8 @@
             </dd>
         </dl>
     </div>
-    @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn btn-default" })
-    @Html.ActionLink("Edit", "Edit", new { userName = Model.UserAccount.UserName }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Back to List", "Index",
+        new {}, new {@class = "btn btn-default"})
+    @Html.ActionLink("Edit", "Edit",
+        new {userName = Model.UserAccount.UserName}, new {@class = "btn btn-primary"})
 </div>

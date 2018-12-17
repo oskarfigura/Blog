@@ -13,7 +13,7 @@ namespace Blog.Areas.Identity.Data
     {
         private readonly BlogContext _context;
         private readonly UserManager<BlogUser> _userManager;
-        private bool _disposed = false;
+        private bool _disposed;
 
         public UserRepo(BlogContext context, UserManager<BlogUser> userManager)
         {

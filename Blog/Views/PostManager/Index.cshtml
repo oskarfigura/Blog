@@ -43,7 +43,8 @@
 
                         @Html.TextBoxFor(m => m.SearchData.PostTitle, new
                         {
-                            @class = "form-control", @id = "inputPostTitle", @placeholder = "Search by post title"
+                            @class = "form-control", @id = "inputPostTitle",
+                            @placeholder = "Search by post title"
                         })
                     </div>
                     <div class="form-group">
@@ -101,21 +102,12 @@
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
                                 {
                                     <button type="button" id="btnDelete-@item.Id" style="margin-right: 5px"
-                                            class="btn btn-danger btn-xs pull-right btnDeletePost" >Delete
+                                            class="btn btn-danger btn-xs pull-right btnDeletePost">
+                                        Delete
                                     </button>
                                 }
-
-                                @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditPosts")).Succeeded)
-                                {
-                                    <button type="button"
-                                            onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @item.Id})'"
-                                            class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
-                                        Edit
-                                    </button>
-                                }
-
                                 <button type="button"
-                                        onclick="location.href = '@Url.Action("Post", "PostManager", new {slug = @item.Slug})'"
+                                        onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @item.Slug})'"
                                         class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
                                     View
                                 </button>
@@ -127,8 +119,8 @@
             </div>
             @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
             {
-                <form asp-controller="PostManager" asp-action="Delete" method="post" id="postDeletePost">
-                    @Html.AntiForgeryToken()
+                <form asp-controller="PostManager" asp-action="Delete"
+                      method="post" id="postDeletePost" asp-antiforgery="true">
                 </form>
             }
         </div>
@@ -167,26 +159,6 @@
         </script>
     }
 
-    <script>
-        $(document).ready(function() {
-            $("#btnDeletePost").click(function(e) {
-                e.preventDefault();
-
-                swal({
-                        title: "Are you sure?",
-                        text: "This post will be deleted permanently!",
-                        icon: "warning",
-                        buttons: true,
-                        dangerMode: true
-                    })
-                    .then((willDelete) => {
-                        if (willDelete) {
-                            $('#postDeleteForm').submit();
-                        }
-                    });
-            });
-        });
-    </script>
     @if (ViewData["PostManagerMessage"] != null)
     {
         <script>

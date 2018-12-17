@@ -90,11 +90,11 @@
             });
         });
     </script>
-    @if (ViewData["AddPostResult"] != null)
+    @if (ViewData["PostManagerMessage"] != null)
     {
         <script>
             $(document).ready(function() {
-                swal("@ViewData["AddPostResult"]", { icon: "info" });
+                swal("@ViewData["PostManagerMessage"]", { icon: "info" });
             });
         </script>
     }

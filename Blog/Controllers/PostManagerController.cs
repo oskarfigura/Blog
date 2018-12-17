@@ -21,11 +21,12 @@ namespace Blog.Controllers
     {
         private const string TempDataOperationParam = "PostOperationResult";
         private const string ViewDataManagerMsgParam = "PostManagerMessage";
-        private const string ViewDataAddPostResult = "AddPostResult";
-        private const string ViewDataEditPostResult = "EditPostResult";
-        private const string ViewDataDeletePostResult = "DeletePostResult";
-        private const string ViewDataPostResultMsg = "PostResultMsg";
-        private const string MsgSomethingIsWrong = "Something went wrong. Please try again.";
+        private const string MsgSomethingIsWrong = "Something went wrong. Please try again";
+        private const string MsgInvalidSlug = "Slug contains reserved characters, please only use letters and spaces.";
+        private const string MsgDuplicateSlug = "Slug already exists, please enter a different slug.";
+        private const string MsgPostCreated = "Post created successfully!";
+        private const string MsgPostUpdated = "Post updated successfully.";
+        private const string MsgPostDeleted = "Post deleted successfully.";
 
         private readonly IPostRepo _postRepo;
         private readonly IUserRepo _userRepo;
@@ -36,6 +37,7 @@ namespace Blog.Controllers
             _userRepo = userRepo;
         }
 
+        // GET: PostManager/ post manager home view with a list of all posts
         public async Task<IActionResult> Index(PostManagerViewModel postManagerView)
         {
             //TODO Run this method to store posts which will be used for db seeding in the future
@@ -53,41 +55,6 @@ namespace Blog.Controllers
             {
                 BlogPosts = await _postRepo.GetPostsBySearchData(postSearchData),
                 SearchData = postSearchData
-            });
-        }
-
-        [Route("/PostManager/ViewPost/{slug?}")]
-        public async Task<IActionResult> Post(string slug)
-        {
-            if (string.IsNullOrEmpty(slug))
-            {
-                return NotFound();
-            }
-
-            var post = await _postRepo.GetPostBySlug(slug);
-
-            if (string.IsNullOrEmpty(post.Id))
-            {
-                return NotFound();
-            }
-
-            if (string.IsNullOrEmpty(post.Content))
-            {
-                return NotFound();
-            }
-
-            var formattedContent = BlogUtils.FormatPostContent(post.Content);
-
-            return View(new PostViewModel()
-            {
-                Id = post.Id,
-                Title = post.Title,
-                Content = formattedContent,
-                PubDate = post.PubDate,
-                Comments = post.Comments,
-                Slug = post.Slug,
-                Author = post.AuthorUserName,
-                EditDate = post.EditDate
             });
         }
 
@@ -126,8 +93,7 @@ namespace Blog.Controllers
 
             if (string.IsNullOrEmpty(slug))
             {
-                ViewData[ViewDataEditPostResult] =
-                    "Slug contains reserved characters, please only use letters and spaces.";
+                ViewData[ViewDataManagerMsgParam] = MsgInvalidSlug;
                 return View(createPostViewModel);
             }
 
@@ -135,23 +101,21 @@ namespace Blog.Controllers
 
             if (!slugIsUnique)
             {
-                ViewData[ViewDataAddPostResult] = "Slug already exists, please enter a different slug.";
+                ViewData[ViewDataManagerMsgParam] = MsgDuplicateSlug;
                 return View(createPostViewModel);
             }
 
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepo.GetUserById(currentUserId);
-
             createPostViewModel.Slug = slug;
+            var user = await GetLoggedInUser();
             var result = await _postRepo.AddPost(createPostViewModel, user);
 
             if (result)
             {
-                TempData[TempDataOperationParam] = "Post created successfully!";
+                TempData[TempDataOperationParam] = MsgPostCreated;
                 return RedirectToAction("Index");
             }
 
-            ViewData[ViewDataAddPostResult] = MsgSomethingIsWrong;
+            ViewData[ViewDataManagerMsgParam] = MsgSomethingIsWrong;
             return View(createPostViewModel);
         }
 
@@ -171,15 +135,7 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            return View(new PostEditViewModel()
-            {
-                PostId = post.Id,
-                Title = post.Title,
-                Content = post.Content,
-                Description = post.Description,
-                Slug = post.Slug,
-                Published = post.IsPublished
-            });
+            return View(CreatePostEditViewModel(post));
         }
 
         // POST: PostManager/Edit, process a change of post data
@@ -197,8 +153,7 @@ namespace Blog.Controllers
 
             if (string.IsNullOrEmpty(slug))
             {
-                ViewData[ViewDataEditPostResult] =
-                    "Slug contains reserved characters, please only use letters and spaces.";
+                ViewData[ViewDataManagerMsgParam] = MsgInvalidSlug;
                 return View(postEditViewModel);
             }
 
@@ -210,14 +165,14 @@ namespace Blog.Controllers
 
                 if (!updateResult)
                 {
-                    ViewData[ViewDataEditPostResult] = "Unable to edit post. Please try again.";
+                    ViewData[ViewDataManagerMsgParam] = MsgSomethingIsWrong;
                 }
 
-                ViewData[ViewDataEditPostResult] = "Post updated successfully.";
+                ViewData[ViewDataManagerMsgParam] = MsgPostUpdated;
                 return View(postEditViewModel);
             }
 
-            ViewData[ViewDataEditPostResult] = "Slug already exists, please enter a different slug.";
+            ViewData[ViewDataManagerMsgParam] = MsgDuplicateSlug;
             return View(postEditViewModel);
         }
 
@@ -231,43 +186,28 @@ namespace Blog.Controllers
 
             if (!deleteResult) return RedirectToAction("Index");
 
-            TempData[TempDataOperationParam] = "Post deleted successfully.";
+            TempData[TempDataOperationParam] = MsgPostDeleted;
             return RedirectToAction("Index");
         }
 
-        // POST: PostManager/AddComment, process adding a comment
-        [Authorize(Policy = "CanComment")]
-        [HttpPost, ActionName("AddComment")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddComment(string comment, string postId, string postSlug)
+        private static PostEditViewModel CreatePostEditViewModel(Post post)
+        {
+            return (new PostEditViewModel()
+            {
+                PostId = post.Id,
+                Title = post.Title,
+                Content = post.Content,
+                Description = post.Description,
+                Slug = post.Slug,
+                Published = post.IsPublished
+            });
+        }
+
+        private async Task<User> GetLoggedInUser()
         {
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var user = await _userRepo.GetUserById(currentUserId);
-            var post = await _postRepo.GetPostById(postId);
-            var result = await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
-
-            if (result != null)
-            {
-                return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
-            }
-
-            return RedirectToAction("Post", new { slug = postSlug });
-        }
-
-        // POST: PostManager/Delete, process deleting a comment
-        [Authorize(Policy = "CanDeleteComments")]
-        [HttpPost, ActionName("DeleteComment")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteComment(string commentId, string postSlug)
-        {
-            if (string.IsNullOrEmpty(commentId))
-            {
-                return NotFound();
-            }
-
-            var result = await _postRepo.DeleteComment(commentId);
-
-            return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
+            return user;
         }
     }
 }

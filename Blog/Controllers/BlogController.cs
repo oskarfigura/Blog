@@ -13,9 +13,10 @@ namespace Blog.Controllers
 {
     public class BlogController : Controller
     {
-        private const string TempDataOperationParam = "BlogOperationResult";
-        private const string ViewDataEditPostResult = "EditPostResult";
-        private const string ViewDataPostDeleteResultMsg = "PostDeleteResult";
+        private const string TempDataOperationParam = "PostOperationResult";
+        private const string MsgSomethingIsWrong = "Something went wrong. Please try again.";
+        private const string MsgPostDeleted = "Post deleted successfully.";
+        private const string CommentsSection = "#comments";
 
         private readonly IPostRepo _postRepo;
         private readonly IUserRepo _userRepo;
@@ -26,22 +27,16 @@ namespace Blog.Controllers
             _userRepo = userRepo;
         }
 
+        // GET: Blog/, view with all published posts
         public async Task<IActionResult> Index()
         {
             var posts = await _postRepo.GetAllPublishedPosts();
 
-            //Get any result messages from CRUD operations on posts
-            if (TempData[TempDataOperationParam] != null)
-            {
-                ViewData[ViewDataPostDeleteResultMsg] = TempData[TempDataOperationParam].ToString();
-            }
-
-            return View(new BlogViewModel()
-            {
-                BlogPosts = posts
-            });
+            return View(CreateBlogViewModel(posts));
         }
 
+        // GET: Blog/Post, view with post from slug (only published)
+        [ActionName("Post")]
         [Route("/Blog/Post/{slug?}")]
         public async Task<IActionResult> Post(string slug)
         {
@@ -57,86 +52,28 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            if (string.IsNullOrEmpty(post.Content))
-            {
-                return NotFound();
-            }
-
-            var formattedContent = BlogUtils.FormatPostContent(post.Content);
-
-            return View(new PostViewModel()
-            {
-                Id = post.Id,
-                Title = post.Title,
-                Content = formattedContent,
-                PubDate = post.PubDate,
-                Comments = post.Comments,
-                Slug = post.Slug
-            });
+            return View(CreatePostViewModel(post));
         }
-        // GET: Blog/Edit, view for editing a post
-        [Authorize(Policy = "CanEditPosts")]
-        public async Task<IActionResult> Edit(string postId)
+
+        // GET: Blog/AnyPost, view with post from slug (published or unpublished)
+        [Authorize(Policy = "CanAccessPostManager")]
+        [ActionName("Post")]
+        [Route("/Blog/AnyPost/{slug?}")]
+        public async Task<IActionResult> AnyPost(string slug)
         {
-            if (string.IsNullOrEmpty(postId))
+            if (string.IsNullOrEmpty(slug))
             {
                 return NotFound();
             }
 
-            var post = await _postRepo.GetPostById(postId);
+            var post = await _postRepo.GetPostBySlug(slug);
 
             if (string.IsNullOrEmpty(post.Id))
             {
                 return NotFound();
             }
 
-            return View(new PostEditViewModel()
-            {
-                PostId = post.Id,
-                Title = post.Title,
-                Content = post.Content,
-                Description = post.Description,
-                Slug = post.Slug,
-                Published = post.IsPublished
-            });
-        }
-
-        // POST: Blog/Edit, process a change of post data
-        [Authorize(Policy = "CanEditPosts")]
-        [HttpPost, ActionName("Edit")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(PostEditViewModel postEditViewModel)
-        {
-            if (string.IsNullOrWhiteSpace(postEditViewModel.PostId))
-            {
-                return NotFound();
-            }
-
-            var slug = BlogUtils.CreateSlug(postEditViewModel.Slug);
-
-            if (string.IsNullOrEmpty(slug))
-            {
-                ViewData[ViewDataEditPostResult] =
-                    "Slug contains reserved characters, please only use letters and spaces.";
-                return View(postEditViewModel);
-            }
-
-            var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(slug, postEditViewModel.PostId);
-
-            if (slugIsUnique)
-            {
-                var updateResult = await _postRepo.UpdatePost(postEditViewModel);
-
-                if (!updateResult)
-                {
-                    ViewData[ViewDataEditPostResult] = "Unable to edit post. Please try again.";
-                }
-                ViewData[ViewDataEditPostResult] = "Post updated successfully.";
-                return View(postEditViewModel);
-            }
-
-            ViewData[ViewDataEditPostResult] = "Slug already exists, please enter a different slug.";
-            return View(postEditViewModel);
+            return View(CreatePostViewModel(post));
         }
 
         // POST: Blog/Delete, process deleting a post
@@ -147,10 +84,11 @@ namespace Blog.Controllers
         {
             var deleteResult = await _postRepo.DeletePost(postId);
 
-            if (!deleteResult) return RedirectToAction("Index");
+            TempData[TempDataOperationParam] = MsgSomethingIsWrong;
+            if (!deleteResult) return RedirectToAction("Index", "PostManager");
 
-            TempData[TempDataOperationParam] = "Post deleted successfully.";
-            return RedirectToAction("Index");
+            TempData[TempDataOperationParam] = MsgPostDeleted;
+            return RedirectToAction("Index", "PostManager");
         }
 
         // POST: Blog/AddComment, process adding a comment
@@ -159,14 +97,13 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddComment(string comment, string postId, string postSlug)
         {
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepo.GetUserById(currentUserId);
+            var user = await GetLoggedInUser();
             var post = await _postRepo.GetPostById(postId);
             var result = await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
 
             if (result != null)
             {
-                return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
+                return Redirect(Url.Action("Post", new { slug = postSlug }) + CommentsSection);
             }
 
             return RedirectToAction("Post", new { slug = postSlug });
@@ -183,9 +120,38 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            var result = await _postRepo.DeleteComment(commentId);
+            await _postRepo.DeleteComment(commentId);
+            return Redirect(Url.Action("Post", new { slug = postSlug }) + CommentsSection);
+        }
 
-            return Redirect(Url.Action("Post", new { slug = postSlug }) + "#comments");
+        private static PostViewModel CreatePostViewModel(Post post)
+        {
+            post.Content = BlogUtils.FormatPostContent(post.Content);
+
+            return (new PostViewModel()
+            {
+                Id = post.Id,
+                Title = post.Title,
+                Content = post.Content,
+                PubDate = post.PubDate,
+                Comments = post.Comments.OrderByDescending(c => c.PubDate),
+                Slug = post.Slug
+            });
+        }
+
+        private static BlogViewModel CreateBlogViewModel(IEnumerable<Post> posts)
+        {
+            return (new BlogViewModel()
+            {
+                BlogPosts = posts.OrderByDescending(p => p.PubDate)
+            });
+        }
+
+        private async Task<User> GetLoggedInUser()
+        {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepo.GetUserById(currentUserId);
+            return user;
         }
     }
 }
