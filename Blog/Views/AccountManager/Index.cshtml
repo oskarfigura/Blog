@@ -5,44 +5,45 @@
     ViewData["Title"] = "Account Manager";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container-fluid">
-    <div class="row">
-        <h2>@ViewData["Title"]</h2>
+<section class="s-content">
+    <div class="row s-content__header">
+        <h1>@ViewData["Title"]</h1>
+        @if (!Model.Accounts.Any())
+        {
+            <h2>No accounts found.</h2>
+        }
         <hr/>
     </div>
 
     <div class="row">
-        <div class="form-group">
-            @using (Html.BeginForm("Index", "AccountManager", 
-                FormMethod.Get, new {id = "searchForm"}))
-            {
-                <div class="form-group">
-                    <label for="inputSearchUserName">Find by username:</label>
 
-                    @Html.TextBoxFor(m => m.AccountSearch.UserName, new
-                    {
-                        @class = "form-control", @id = "inputSearchUserName",
-                        @placeholder = "Search by username"
-                    })
-                </div>
+        @using (Html.BeginForm("Index", "AccountManager",
+            FormMethod.Get, new {id = "searchForm"}))
+        {
+            <div class="form-field">
+                <label for="inputSearchUserName">Find by username:</label>
 
-                <div class="form-group">
-                    <label for="filterByRole">Filter by role:</label>
+                @Html.TextBoxFor(m => m.AccountSearch.UserName, new
+                {
+                    @class = "full-width", @id = "inputSearchUserName",
+                    @placeholder = "Search by username"
+                })
+            </div>
 
-                    @Html.DropDownListFor(m => m.AccountSearch.Role, 
-                        Model.AvailableIdentityRoles.Select(item => new SelectListItem
-                        {Value = item.Name.ToString(), Text = item.Name.ToString(),}), 
-                        "All Roles", new {@class = "form-control", @id = "filterByRole"})
+            <div class="form-field">
+                <label for="filterByRole">Filter by role:</label>
 
-                </div>
-                <button type="submit" class="btn btn-primary">Search</button>
-            }
-        </div>
+                @Html.DropDownListFor(m => m.AccountSearch.Role,
+                    Model.AvailableIdentityRoles.Select(item => new SelectListItem
+                    {Value = item.Name.ToString(), Text = item.Name.ToString(),}),
+                    "All Roles", new {@class = "full-width", @id = "filterByRole"})
+
+            </div>
+            <button type="submit" class="btn">Search</button>
+        }
+
     </div>
-    @if (!Model.Accounts.Any())
-    {
-        <h4>No accounts found.</h4>
-    }
+
     @if (Model.Accounts.Any())
     {
         <div class="row">
@@ -65,6 +66,8 @@
                             @Html.DisplayNameFor(model => model.Accounts.First().Role)
                         </th>
                         <th></th>
+                        <th></th>
+                        <th></th>
                     </tr>
 
                     @foreach (var user in Model.Accounts)
@@ -86,27 +89,32 @@
                                 @Html.DisplayFor(modelItem => user.Role)
                             </td>
                             <td>
+                                <button type="button" class="btn btn--small btn--pill"
+                                        onclick="location.href = '@Url.Action("Details", "AccountManager",
+                                                                      new {userName = user.UserName})'"
+                                        style="margin-right: 5px">
+                                    View
+                                </button>
+                            </td>
+                            <td>
+                                @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditUsers")).Succeeded)
+                                {
+                                    <button type="button" class="btn btn--small btn--pill"
+                                            onclick="location.href = '@Url.Action("Edit", "AccountManager",
+                                                                          new {userName = user.UserName})'"
+                                            style="margin-right: 5px">
+                                        Edit
+                                    </button>
+                                }
+                            </td>
+                            <td>
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteUsers")).Succeeded)
                                 {
                                     <button type="button" id="btnDelete-@user.UserName" style="margin-right: 5px"
-                                            class="btn btn-danger btn-xs pull-right btnDeleteUser">Delete
+                                            class="btn btn--small btn--pill btn--danger btnDeleteUser">
+                                        Delete
                                     </button>
                                 }
-
-                                @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditUsers")).Succeeded)
-                                {
-                                    <button type="button" class="btn btn-primary btn-xs pull-right"
-                                            onclick="location.href = '@Url.Action("Edit", "AccountManager",
-                                                                          new {userName = user.UserName})'"
-                                             style="margin-right: 5px">Edit
-                                    </button>
-                                }
-
-                                <button type="button" class="btn btn-primary btn-xs pull-right"
-                                        onclick="location.href = '@Url.Action("Details", "AccountManager",
-                                                                      new {userName = user.UserName})'"
-                                         style="margin-right: 5px">View
-                                </button>
                             </td>
                         </tr>
                     }
@@ -114,13 +122,13 @@
             </div>
             @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteUsers")).Succeeded)
             {
-                <form asp-controller="AccountManager" asp-action="Delete" 
+                <form asp-controller="AccountManager" asp-action="Delete"
                       method="post" id="postDeleteUser" asp-antiforgery="true">
                 </form>
             }
         </div>
     }
-</div>
+</section>
 
 @section Scripts
 {
