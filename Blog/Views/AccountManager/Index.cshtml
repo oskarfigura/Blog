@@ -16,10 +16,8 @@
     </div>
 
     <div class="row">
-
-        @using (Html.BeginForm("Index", "AccountManager",
-            FormMethod.Get, new {id = "searchForm"}))
-        {
+        <form asp-action="Index" asp-controller="AccountManager" 
+              asp-antiforgery="true" method="post" id="searchForm">
             <div class="form-field">
                 <label for="inputSearchUserName">Find by username:</label>
 
@@ -40,8 +38,7 @@
 
             </div>
             <button type="submit" class="btn">Search</button>
-        }
-
+        </form>
     </div>
 
     @if (Model.Accounts.Any())

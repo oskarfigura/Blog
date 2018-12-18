@@ -769,6 +769,33 @@ input[type="button"].btn--danger:focus {
     border-color: #ba4643;
 }
 
+/* button success
+* ------------------------------------------------- */
+
+.btn.btn--success,
+button.btn--success,
+input[type="submit"].btn--success,
+input[type="reset"].btn--success,
+input[type="button"].btn--success {
+    background: #5cb85c;
+    border-color: #5cb85c;
+    color: #FFFFFF;
+}
+
+.btn.btn--success:hover,
+button.btn--success:hover,
+input[type="submit"].btn--success:hover,
+input[type="reset"].btn--success:hover,
+input[type="button"].btn--success:hover,
+.btn.btn--success:focus,
+button.btn--success:focus,
+input[type="submit"].btn--success:focus,
+input[type="reset"].btn--success:focus,
+input[type="button"].btn--success:focus {
+    background: #428742;
+    border-color: #428742;
+}
+
 /* button modifiers
  * ------------------------------------------------- */
 
