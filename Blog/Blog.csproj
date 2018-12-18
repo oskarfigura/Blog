@@ -28,6 +28,30 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\fonts\librebaskerville\librebaskerville-bold-webfont.woff2" />
+    <None Include="wwwroot\fonts\librebaskerville\librebaskerville-italic-webfont.woff2" />
+    <None Include="wwwroot\fonts\librebaskerville\librebaskerville-regular-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-black-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-blackitalic-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-bold-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-bolditalic-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-extrabold-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-extrabolditalic-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-extralight-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-extralightitalic-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-light-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-lightitalic-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-medium-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-mediumitalic-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-regular-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-regularitalic-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-semibold-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-semibolditalic-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-thin-webfont.woff2" />
+    <None Include="wwwroot\fonts\metropolis\metropolis-thinitalic-webfont.woff2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="Views\Blog\Comments.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
