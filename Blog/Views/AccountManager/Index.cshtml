@@ -8,15 +8,11 @@
 <section class="s-content">
     <div class="row s-content__header">
         <h1>@ViewData["Title"]</h1>
-        @if (!Model.Accounts.Any())
-        {
-            <h2>No accounts found.</h2>
-        }
         <hr/>
     </div>
 
     <div class="row">
-        <form asp-action="Index" asp-controller="AccountManager" 
+        <form asp-action="Index" asp-controller="AccountManager"
               asp-antiforgery="true" method="post" id="searchForm">
             <div class="form-field">
                 <label for="inputSearchUserName">Find by username:</label>
@@ -123,6 +119,16 @@
                       method="post" id="postDeleteUser" asp-antiforgery="true">
                 </form>
             }
+        </div>
+    }
+    else
+    {
+        <div class="row text-center">
+            <h2>No accounts found.</h2>
+            <button type="button" onclick="location.href = '@Url.Action("Index", "AccountManager")'"
+                    class="btn btn-primary">
+                View all users
+            </button>
         </div>
     }
 </section>

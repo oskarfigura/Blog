@@ -6,11 +6,12 @@
     ViewData["Title"] = "Post Manager";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container-fluid">
-    <div class="row">
-        <h2>@ViewData["Title"]</h2>
+<section class="s-content">
+    <div class="row s-content__header">
+        <h1>@ViewData["Title"]</h1>
         <hr/>
-
+    </div>
+    <div class="row">
         @if (!Model.BlogPosts.Any())
         {
             if (Model.SearchData != null)
@@ -35,28 +36,28 @@
     @if (Model.BlogPosts.Any())
     {
         <div class="row">
-            <div class="form-group">
+            <div class="form-field">
                 @using (Html.BeginForm("Index", "PostManager", FormMethod.Get))
                 {
-                    <div class="form-group">
+                    <div class="form-field">
                         <label for="inputPostTitle">Find by post title:</label>
 
                         @Html.TextBoxFor(m => m.SearchData.PostTitle, new
                         {
-                            @class = "form-control", @id = "inputPostTitle",
+                            @class = "full-width", @id = "inputPostTitle",
                             @placeholder = "Search by post title"
                         })
                     </div>
-                    <div class="form-group">
+                    <div class="form-field">
                         <label>Filter posts by publish status: </label>
                         <select asp-for="@Model.SearchData.PublishStatus"
                                 asp-items="Html.GetEnumSelectList<PostManagerSearch.PublishStatusList>()"
-                                class="form-control">
+                                class="full-width">
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Search</button>
                     <button type="button" onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
-                            class="btn btn-success">
+                            class="btn btn--success">
                         Create New Post
                     </button>
                 }
@@ -80,6 +81,7 @@
                             @Html.DisplayNameFor(model => model.BlogPosts.First().PubDate)
                         </th>
                         <th></th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -99,18 +101,19 @@
                                 @Html.DisplayFor(modelItem => item.PubDate)
                             </td>
                             <td>
+                                <button onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @item.Slug})'"
+                                        type="button" class="btn btn--small btn--pill">
+                                    View
+                                </button>
+                            </td>
+                            <td>
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
                                 {
-                                    <button type="button" id="btnDelete-@item.Id" style="margin-right: 5px"
-                                            class="btn btn-danger btn-xs pull-right btnDeletePost">
+                                    <button class="btn btn--small btn--pill btn--danger btnDeletePost"
+                                            type="button" id="btnDelete-@item.Id">
                                         Delete
                                     </button>
                                 }
-                                <button type="button"
-                                        onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @item.Slug})'"
-                                        class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
-                                    View
-                                </button>
                             </td>
                         </tr>
                     }
@@ -125,7 +128,7 @@
             }
         </div>
     }
-</div>
+</section>
 
 @section Scripts
 {
