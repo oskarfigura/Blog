@@ -5,8 +5,9 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
+
     <li>
-        <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+        <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">My Profile</a>
     </li>
     <li>
         <form asp-area="Identity" asp-page="/Account/Logout" 
@@ -17,6 +18,7 @@
 }
 else
 {
+
     <li>
         <a asp-area="Identity" asp-page="/Account/Register" title="Register">Register</a>
     </li>

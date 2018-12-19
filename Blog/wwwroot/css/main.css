@@ -630,6 +630,14 @@ label > .label-text {
     line-height: inherit;
 }
 
+label.postTitleDate {
+    font-family: "metropolis-regular", sans-serif;
+    font-size: 1.4rem;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1.875;
+    color: #656565;
+}
 
 label > input[type="checkbox"], label > input[type="radio"] {
     margin: 0;
@@ -3151,7 +3159,7 @@ footer h4::after {
  * ------------------------------------------------------------------- */
 
 .s-content__main {
-    margin-top: 6rem;
+    margin-top: 2rem;
     padding-left: 6rem;
     padding-right: 6rem;
 }
@@ -3475,8 +3483,8 @@ footer h4::after {
 
 .comments-wrap {
     background-color: #e5e5e5;
-    padding: 8.4rem 0 9rem;
-    margin-top: 10.2rem;
+    padding: 0rem 0 9rem;
+    margin-top: 5rem;
 }
 
 /* comments
