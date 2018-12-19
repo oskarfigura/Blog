@@ -66,6 +66,7 @@ namespace Blog.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");

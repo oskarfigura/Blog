@@ -11,7 +11,7 @@
     </div>
     <div class="row s-content__header">
         <div class="col-md-offset-4 col-md-4">
-            <form asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <form asp-route-returnUrl="@Model.ReturnUrl" method="post" asp-antiforgery="true">
                 <h4>Create a new account.</h4>
                 <hr/>
                 <div class="form-field">

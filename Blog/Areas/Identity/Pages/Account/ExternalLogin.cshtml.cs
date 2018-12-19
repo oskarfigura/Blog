@@ -52,6 +52,7 @@ namespace Blog.Areas.Identity.Pages.Account
             return RedirectToPage("./Login");
         }
 
+        [ValidateAntiForgeryToken]
         public IActionResult OnPost(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
@@ -102,6 +103,7 @@ namespace Blog.Areas.Identity.Pages.Account
             }
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");

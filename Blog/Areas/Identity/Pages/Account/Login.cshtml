@@ -14,7 +14,7 @@
     <div class="row s-content__header">
         <div class="col-md-offset-4 col-md-4">
             <section>
-                <form method="post">
+                <form method="post" asp-antiforgery="true">
                     <div class="form-field">
                         <label asp-for="Input.Email"></label>
                         <input asp-for="Input.Email" class="full-width" placeholder="Email"/>
