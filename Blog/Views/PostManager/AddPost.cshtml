@@ -16,39 +16,41 @@
             <div class="form-field">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="full-width" type="text" required="required"
-                       data-msg="Please enter a title." />
+                       data-msg="Please enter a title." placeholder="Title"/>
             </div>
             <div class="form-field">
-                <label asp-for="Slug" class="control-label"></label>
+                <label asp-for="Slug"></label>
                 <em>This is the part of the URL that will be used to identify this post</em>
                 <input asp-for="Slug" class="full-width" type="text" required="required"
-                       data-msg="Please enter a slug." />
+                       data-msg="Please enter a slug." placeholder="Slug"/>
             </div>
 
             <div class="form-field">
-                <label asp-for="Description" class="control-label"></label>
+                <label asp-for="Description"></label>
                 <em>Short post description displayed on home-page</em>
                 <textarea asp-for="Description" class="form-control" required="required"
-                          data-msg="Post description cannot be empty." style="resize: vertical;" rows="5">
-                    </textarea>
+                          data-msg="Post description cannot be empty." 
+                            style="resize: vertical;" rows="5" 
+                            placeholder="Post description">
+                </textarea>
             </div>
             <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
+                <label asp-for="Content"></label>
                 <textarea asp-for="Content" class="summernote form-control" required="required"
                           data-msg="Post content cannot be empty." style="display: none;">
                     </textarea>
             </div>
             <label class="form-field add-bottom">
                 <span class="label-text">Publish post?</span>
-                <input asp-for="Publish" type="checkbox" />
+                <input asp-for="Publish" type="checkbox"/>
             </label>
 
             <div class="form-field">
-                @Html.ActionLink("Back to List", "Index", new { }, new { @class = "btn-cust btn-cust--danger" })
-                <input type="submit" value="Create" class="btn-cust btn-cust--success" id="btnSubmit" />
+                @Html.ActionLink("Back to List", "Index", new {}, new {@class = "btn-cust btn-cust--danger"})
+                <input type="submit" value="Create" class="btn-cust btn-cust--success" id="btnSubmit"/>
             </div>
         </form>
-        </div>
+    </div>
 </section>
 
 @section Scripts {

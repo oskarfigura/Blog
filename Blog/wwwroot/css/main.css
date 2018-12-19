@@ -3382,11 +3382,17 @@ footer h4::after {
     width: 100%;
 }
 
+
+.form-field.postTools {
+    display: inline-block;
+}
+
+
+
 /* ------------------------------------------------------------------- 
  * responsive:
  * blog styles
  * ------------------------------------------------------------------- */
-
 @media only screen and (max-width: 1200px) {
     .s-content--narrow .s-content__header { padding: 0 6rem; }
 

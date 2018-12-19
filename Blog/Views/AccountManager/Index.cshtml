@@ -15,13 +15,9 @@
         <form asp-action="Index" asp-controller="AccountManager"
               asp-antiforgery="true" method="post" id="searchForm">
             <div class="form-field">
-                <label for="inputSearchUserName">Find by username:</label>
-
-                @Html.TextBoxFor(m => m.AccountSearch.UserName, new
-                {
-                    @class = "full-width", @id = "inputSearchUserName",
-                    @placeholder = "Search by username"
-                })
+                <label for="inputSearchUserName">Find by username:</label>               
+                <input asp-for="AccountSearch.UserName" class="full-width" type="text"
+                        placeholder="Search by username" id="inputSearchUserName"/>
             </div>
 
             <div class="form-field">
