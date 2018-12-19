@@ -33,7 +33,7 @@
                     "All Roles", new {@class = "full-width", @id = "filterByRole"})
 
             </div>
-            <button type="submit" class="btn">Search</button>
+            <button type="submit" class="btn-cust">Search</button>
         </form>
     </div>
 
@@ -82,7 +82,7 @@
                                 @Html.DisplayFor(modelItem => user.Role)
                             </td>
                             <td>
-                                <button type="button" class="btn btn--small btn--pill"
+                                <button type="button" class="btn-cust btn-cust--small btn-cust--pill"
                                         onclick="location.href = '@Url.Action("Details", "AccountManager",
                                                                       new {userName = user.UserName})'"
                                         style="margin-right: 5px">
@@ -92,7 +92,7 @@
                             <td>
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanEditUsers")).Succeeded)
                                 {
-                                    <button type="button" class="btn btn--small btn--pill"
+                                    <button type="button" class="btn-cust btn-cust--small btn-cust--pill"
                                             onclick="location.href = '@Url.Action("Edit", "AccountManager",
                                                                           new {userName = user.UserName})'"
                                             style="margin-right: 5px">
@@ -104,7 +104,8 @@
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeleteUsers")).Succeeded)
                                 {
                                     <button type="button" id="btnDelete-@user.UserName" style="margin-right: 5px"
-                                            class="btn btn--small btn--pill btn--danger btnDeleteUser">
+                                            class="btn-cust btn-cust--small btn-cust--pill 
+                                            btn-cust--danger btnDeleteUser">
                                         Delete
                                     </button>
                                 }
@@ -126,7 +127,7 @@
         <div class="row text-center">
             <h2>No accounts found.</h2>
             <button type="button" onclick="location.href = '@Url.Action("Index", "AccountManager")'"
-                    class="btn btn-primary">
+                    class="btn-cust">
                 View all users
             </button>
         </div>

@@ -3,56 +3,66 @@
     ViewData["Title"] = "Edit Post";
 }
 
-<h2>@ViewData["Title"]</h2>
-
-<hr />
-<div class="row">
-    <div class="col-md-12">
-        <form asp-action="Edit" asp-antiforgery="true" class="postForm" method="post"
-              novalidate="novalidate">
-            <input asp-for="PostId" type="hidden" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" type="text" required="required"
-                       data-msg="Please enter a title." />
-            </div>
-            <div class="form-group">
-                <label asp-for="Slug" class="control-label"></label>
-                <p>This is the part of the URL that will be used to identify this post</p>
-                <input asp-for="Slug" class="form-control" type="text" required="required"
-                       data-msg="Please enter a slug." />
-            </div>
-            <div class="form-group">
-                <label asp-for="Published"></label>
-                <input asp-for="Published" type="checkbox" />
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <p>Short post description displayed on home-page</p>
-                <textarea asp-for="Description" class="form-control" required="required"
-                          data-msg="Post description cannot be empty." style="resize: vertical;" rows="5">
-                </textarea>
-            </div>
-            <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
-                <textarea asp-for="Content" class="summernote form-control" required="required"
-                          data-msg="Post content cannot be empty." style="display: none;">
-                </textarea>
-            </div>
-
-            <div class="form-group">
-                <button onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @Model.Slug})'"
-                    type="button" class="btn btn-danger">Back to post
-                </button>
-                <input type="submit" value="Save Changes" class="btn btn-success" id="btnSubmit" />
-            </div>
-        </form>
+<section class="s-content">
+    <div class="row s-content__header">
+        <h1>@ViewData["Title"]</h1>
+        <hr/>
     </div>
-</div>
+
+    <div class="row">
+            <form asp-action="Edit" asp-antiforgery="true" class="postForm" method="post"
+                  novalidate="novalidate">
+                <input asp-for="PostId" type="hidden"/>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-field">
+                    <label asp-for="Title"></label>
+                    <input asp-for="Title" class="full-width" type="text" required="required"
+                           data-msg="Please enter a title."/>
+                </div>
+
+                <div class="form-field">
+                    <label asp-for="Slug"></label>
+                    <em>This is the part of the URL that will be used to identify this post</em>
+                    <input asp-for="Slug" class="full-width" type="text" required="required"
+                           data-msg="Please enter a slug."/>
+                </div>
+
+                <div class="form-field">
+                    <label asp-for="Description"></label>
+                    <em>Short post description displayed on home-page</em>
+                    <textarea asp-for="Description" class="form-control" required="required"
+                          data-msg="Post description cannot be empty." style="resize: vertical;" rows="5">
+                    </textarea>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Content"></label>
+                    <textarea asp-for="Content" class="summernote form-control" required="required"
+                          data-msg="Post content cannot be empty." style="display: none;">
+                    </textarea>
+                </div>
+
+                <label class="form-field add-bottom">
+                    <span class="label-text">Publish post?</span>
+                    <input asp-for="Published" type="checkbox" />
+                </label>
+
+                <div class="form-field">
+                    <button onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @Model.Slug})'"
+                            type="button" class="btn-cust btn-cust--danger">
+                        Back to post
+                    </button>
+                    <input type="submit" value="Save Changes" class="btn-cust btn-cust--success" id="btnSubmit"/>
+                </div>
+            </form>
+        </div>
+</section>
 
 @section Scripts {
-    <script src="@Url.Content("https://cdn.jsdelivr.net/npm/jquery-validation@1.14.0/dist/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("https://cdn.jsdelivr.net/npm/jquery-validation@1.14.0/dist/jquery.validate.min.js")">
+
+    </script>
 
     <script>
         $(document).ready(function() {

@@ -68,9 +68,10 @@
             </dd>
         </dl>
         @Html.ActionLink("Back to List", "Index",
-            new {}, new {@class = "btn"})
+            new {}, new {@class = "btn-cust" })
         @Html.ActionLink("Edit", "Edit",
-            new {userName = Model.UserAccount.UserName}, new {@class = "btn btn--danger"})
+            new {userName = Model.UserAccount.UserName}, 
+            new {@class = "btn-cust btn-cust--danger" })
     </div>
 
 </section>

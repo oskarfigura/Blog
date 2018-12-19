@@ -18,7 +18,7 @@
             {
                 <h4>Your search, did not match any posts.</h4>
                 <button type="button" onclick="location.href = '@Url.Action("Index", "PostManager")'"
-                        class="btn btn-primary">
+                        class="btn-cust">
                     View all posts
                 </button>
             }
@@ -27,7 +27,7 @@
                 <h4>There are currently no posts on this blog.</h4>
             }
             <button type="button" onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
-                    class="btn btn-success">
+                    class="btn-cust btn-cust--success">
                 Create New Post
             </button>
         }
@@ -55,9 +55,9 @@
                                 class="full-width">
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="submit" class="btn-cust">Search</button>
                     <button type="button" onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
-                            class="btn btn--success">
+                            class="btn-cust btn-cust--success">
                         Create New Post
                     </button>
                 }
@@ -102,14 +102,14 @@
                             </td>
                             <td>
                                 <button onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @item.Slug})'"
-                                        type="button" class="btn btn--small btn--pill">
+                                        type="button" class="btn-cust btn-cust--small btn-cust--pill">
                                     View
                                 </button>
                             </td>
                             <td>
                                 @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
                                 {
-                                    <button class="btn btn--small btn--pill btn--danger btnDeletePost"
+                                    <button class="btn-cust btn-cust--small btn-cust--pill btn-cust--danger btnDeletePost"
                                             type="button" id="btnDelete-@item.Id">
                                         Delete
                                     </button>

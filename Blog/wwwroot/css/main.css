@@ -367,7 +367,7 @@ th:last-child, td:last-child { padding-right: 0; }
  * ## spacing 
  * ------------------------------------------------------------------- */
 
-button, .btn { margin-bottom: 1.2rem; }
+button, .btn-cust { margin-bottom: 1.2rem; }
 
 fieldset { margin-bottom: 1.5rem; }
 
@@ -625,11 +625,11 @@ input[type="checkbox"], input[type="radio"] { display: inline; }
 
 label > .label-text {
     display: inline-block;
-    margin-left: 1rem;
-    font-family: "librebaskerville-regular", serif;
-    font-weight: normal;
+    font-size: larger;
+    font-weight: bold;
     line-height: inherit;
 }
+
 
 label > input[type="checkbox"], label > input[type="radio"] {
     margin: 0;
@@ -674,7 +674,7 @@ textarea:-webkit-autofill:focus, select:-webkit-autofill, select:-webkit-autofil
  * # buttons
  *
  * ------------------------------------------------------------------- */
-.btn,
+.btn-cust,
 input[type="submit"],
 input[type="reset"],
 input[type="button"] {
@@ -699,12 +699,12 @@ input[type="button"] {
     border: .2rem solid #c5c5c5;
 }
 
-.btn:hover,
+.btn-cust:hover,
 button:hover,
 input[type="submit"]:hover,
 input[type="reset"]:hover,
 input[type="button"]:hover,
-.btn:focus,
+.btn-cust:focus,
 button:focus,
 input[type="submit"]:focus,
 input[type="reset"]:focus,
@@ -718,26 +718,26 @@ input[type="button"]:focus {
 /* button primary
  * ------------------------------------------------- */
 
-.btn.btn--primary,
-button.btn--primary,
-input[type="submit"].btn--primary,
-input[type="reset"].btn--primary,
-input[type="button"].btn--primary {
+.btn-cust.btn-cust--primary,
+button.btn-cust--primary,
+input[type="submit"].btn-cust--primary,
+input[type="reset"].btn-cust--primary,
+input[type="button"].btn-cust--primary {
     background: #000000;
     border-color: #000000;
     color: #FFFFFF;
 }
 
-.btn.btn--primary:hover,
-button.btn--primary:hover,
-input[type="submit"].btn--primary:hover,
-input[type="reset"].btn--primary:hover,
-input[type="button"].btn--primary:hover,
-.btn.btn--primary:focus,
-button.btn--primary:focus,
-input[type="submit"].btn--primary:focus,
-input[type="reset"].btn--primary:focus,
-input[type="button"].btn--primary:focus {
+.btn-cust.btn-cust--primary:hover,
+button.btn-cust--primary:hover,
+input[type="submit"].btn-cust--primary:hover,
+input[type="reset"].btn-cust--primary:hover,
+input[type="button"].btn-cust--primary:hover,
+.btn-cust.btn-cust--primary:focus,
+button.btn-cust--primary:focus,
+input[type="submit"].btn-cust--primary:focus,
+input[type="reset"].btn-cust--primary:focus,
+input[type="button"].btn-cust--primary:focus {
     background: #0054a5;
     border-color: #0054a5;
 }
@@ -745,26 +745,26 @@ input[type="button"].btn--primary:focus {
 /* button danger
  * ------------------------------------------------- */
 
-.btn.btn--danger,
-button.btn--danger,
-input[type="submit"].btn--danger,
-input[type="reset"].btn--danger,
-input[type="button"].btn--danger {
+.btn-cust.btn-cust--danger,
+button.btn-cust--danger,
+input[type="submit"].btn-cust--danger,
+input[type="reset"].btn-cust--danger,
+input[type="button"].btn-cust--danger {
     background: #d9534f;
     border-color: #d9534f;
     color: #FFFFFF;
 }
 
-.btn.btn--danger:hover,
-button.btn--danger:hover,
-input[type="submit"].btn--danger:hover,
-input[type="reset"].btn--danger:hover,
-input[type="button"].btn--danger:hover,
-.btn.btn--danger:focus,
-button.btn--danger:focus,
-input[type="submit"].btn--danger:focus,
-input[type="reset"].btn--danger:focus,
-input[type="button"].btn--danger:focus {
+.btn-cust.btn-cust--danger:hover,
+button.btn-cust--danger:hover,
+input[type="submit"].btn-cust--danger:hover,
+input[type="reset"].btn-cust--danger:hover,
+input[type="button"].btn-cust--danger:hover,
+.btn-cust.btn-cust--danger:focus,
+button.btn-cust--danger:focus,
+input[type="submit"].btn-cust--danger:focus,
+input[type="reset"].btn-cust--danger:focus,
+input[type="button"].btn-cust--danger:focus {
     background: #ba4643;
     border-color: #ba4643;
 }
@@ -772,26 +772,26 @@ input[type="button"].btn--danger:focus {
 /* button success
 * ------------------------------------------------- */
 
-.btn.btn--success,
-button.btn--success,
-input[type="submit"].btn--success,
-input[type="reset"].btn--success,
-input[type="button"].btn--success {
+.btn-cust.btn-cust--success,
+button.btn-cust--success,
+input[type="submit"].btn-cust--success,
+input[type="reset"].btn-cust--success,
+input[type="button"].btn-cust--success {
     background: #5cb85c;
     border-color: #5cb85c;
     color: #FFFFFF;
 }
 
-.btn.btn--success:hover,
-button.btn--success:hover,
-input[type="submit"].btn--success:hover,
-input[type="reset"].btn--success:hover,
-input[type="button"].btn--success:hover,
-.btn.btn--success:focus,
-button.btn--success:focus,
-input[type="submit"].btn--success:focus,
-input[type="reset"].btn--success:focus,
-input[type="button"].btn--success:focus {
+.btn-cust.btn-cust--success:hover,
+button.btn-cust--success:hover,
+input[type="submit"].btn-cust--success:hover,
+input[type="reset"].btn-cust--success:hover,
+input[type="button"].btn-cust--success:hover,
+.btn-cust.btn-cust--success:focus,
+button.btn-cust--success:focus,
+input[type="submit"].btn-cust--success:focus,
+input[type="reset"].btn-cust--success:focus,
+input[type="button"].btn-cust--success:focus {
     background: #428742;
     border-color: #428742;
 }
@@ -799,38 +799,38 @@ input[type="button"].btn--success:focus {
 /* button modifiers
  * ------------------------------------------------- */
 
-.btn.full-width, button.full-width {
+.btn-cust.full-width, button.full-width {
     width: 100%;
     margin-right: 0;
 }
 
-.btn--small, button.btn--small {
+.btn-cust--small, button.btn-cust--small {
     height: 2.5rem !important;
     line-height: 2.1rem !important;
 }
 
-.btn--medium, button.btn--medium {
+.btn-cust--medium, button.btn-cust--medium {
     height: 5.7rem !important;
     line-height: 5.3rem !important;
 }
 
-.btn--large, button.btn--large {
+.btn-cust--large, button.btn-cust--large {
     height: 6rem !important;
     line-height: 5.6rem !important;
 }
 
-.btn--stroke, button.btn--stroke {
+.btn-cust--stroke, button.btn-cust--stroke {
     background: transparent !important;
     border: 0.2rem solid #000000;
     color: #000000;
 }
 
-.btn--stroke:hover, button.btn--stroke:hover {
+.btn-cust--stroke:hover, button.btn-cust--stroke:hover {
     border: 0.2rem solid #0054a5;
     color: #0054a5;
 }
 
-.btn--pill, button.btn--pill {
+.btn-cust--pill, button.btn-cust--pill {
     padding-left: 3rem !important;
     padding-right: 3rem !important;
     border-radius: 1000px !important;
@@ -1588,7 +1588,6 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 
 .s-pageheader {
     min-height: 174px;
-    background-image: url(../images/hero-bg.jpg);
     background-repeat: no-repeat;
     background-position: center center;
     position: relative;
