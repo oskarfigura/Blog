@@ -90,9 +90,8 @@
                     {
                         <div style="text-align: center;">
                             <h3 class="h2">Please log in to post comments</h3>
-                            <button asp-area="Identity" asp-page="/Account/Login"
-                                    title="Login" type="button" class="btn-cust btn-cust--stroke"
-                                    onclick="location.href = '@Url.Action("Edit", "PostManager", new {postId = @Model.Id})'">
+                            <button title="Login" type="button" class="btn-cust btn-cust--stroke"
+                                    onclick="location.href = '@Url.Action("/Account/Login", "Identity")'">
                                 Login
                             </button>
                         </div>
