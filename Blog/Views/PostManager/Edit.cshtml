@@ -6,6 +6,7 @@
 <section class="s-content">
     <div class="row s-content__header">
         <h1>@ViewData["Title"]</h1>
+        <h3 class="text-danger">@Html.ValidationMessage("errorMsg")</h3>
         <hr/>
     </div>
 
@@ -104,12 +105,4 @@
             });
         });
     </script>
-    @if (ViewData["PostManagerMessage"] != null)
-    {
-        <script>
-            $(document).ready(function() {
-                swal("@ViewData["PostManagerMessage"]", { icon: "info" });
-            });
-        </script>
-    }
 }

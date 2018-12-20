@@ -9,9 +9,9 @@ namespace Blog.Areas.Identity.Data
     public interface IPostRepo : IDisposable
     {
         Task<bool> AddPost(PostCreateViewModel postCreateViewModel, User author);
-        Task<IEnumerable<Post>> GetAllPosts();
-        Task<IEnumerable<Post>> GetAllPublishedPosts();
-        Task<IEnumerable<Post>> GetPostsBySearchData(PostManagerSearch searchData);
+        Task<ICollection<Post>> GetAllPosts();
+        Task<ICollection<Post>> GetAllPublishedPosts();
+        Task<ICollection<Post>> GetPostsBySearchData(PostManagerSearch searchData);
         Task<Post> GetPostById(string postId);
         Task<Post> GetPostBySlug(string slug);
         Task<Post> GetPublishedPostBySlug(string slug);
