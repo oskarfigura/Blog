@@ -24,31 +24,31 @@ namespace Blog.Areas.Identity.Data
         /**
          * Find users using search data 
          */
-        public async Task<IEnumerable<User>> GetUsersBySearchData(AccountSearch searchModel)
+        public async Task<ICollection<User>> GetUsersBySearchData(AccountSearch searchModel)
         {
             var result = await GetUsers();
 
-            if (searchModel == null) return result;
+            if (searchModel == null) return result.ToList();
 
             if (!string.IsNullOrEmpty(searchModel.UserName))
             {
                 result = result.Where(x => x.UserName.Contains(searchModel.UserName,
-                    StringComparison.OrdinalIgnoreCase));
+                    StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             if (!string.IsNullOrEmpty(searchModel.Role))
             {
                 result = result.Where(x => x.Role.Contains(searchModel.Role,
-                    StringComparison.OrdinalIgnoreCase));
+                    StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            return result;
+            return result.ToList();
         }
 
         /**
          * Return all available user roles
          */
-        public async Task<IEnumerable<IdentityRole>> GetAllRoles()
+        public async Task<ICollection<IdentityRole>> GetAllRoles()
         {
             return await _context.Roles.ToListAsync();
         }
@@ -231,7 +231,7 @@ namespace Blog.Areas.Identity.Data
         /**
          * Returns list of all users
          */
-        private async Task<IEnumerable<User>> GetUsers()
+        private async Task<ICollection<User>> GetUsers()
         {
             var users = await GetBlogUsersFromDb();
             var result = new List<User>();
@@ -271,7 +271,7 @@ namespace Blog.Areas.Identity.Data
         /**
          * Returns a list of all users from the database
          */
-        private async Task<IEnumerable<BlogUser>> GetBlogUsersFromDb()
+        private async Task<ICollection<BlogUser>> GetBlogUsersFromDb()
         {
             return await _context.Users.ToListAsync();
         }
