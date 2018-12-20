@@ -57,7 +57,7 @@ namespace Blog.Controllers
 
         // GET: Blog/AnyPost, view with post from slug (published or unpublished)
         [Authorize(Policy = "CanAccessPostManager")]
-        [ActionName("Post")]
+        [ActionName("AnyPost")]
         [Route("/Blog/AnyPost/{slug?}")]
         public async Task<IActionResult> AnyPost(string slug)
         {
@@ -73,7 +73,7 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            return View(CreatePostViewModel(post));
+            return View("Post", CreatePostViewModel(post));
         }
 
         // POST: Blog/Delete, process deleting a post
@@ -99,14 +99,14 @@ namespace Blog.Controllers
         {
             var user = await GetLoggedInUser();
             var post = await _postRepo.GetPostById(postId);
-            var result = await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
+            await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
 
-            if (result != null)
+            if (post.IsPublished)
             {
                 return Redirect(Url.Action("Post", new { slug = postSlug }) + CommentsSection);
             }
 
-            return RedirectToAction("Post", new { slug = postSlug });
+            return Redirect(Url.Action("AnyPost", new { slug = postSlug }) + CommentsSection);
         }
 
         // POST: Blog/Delete, process deleting a comment

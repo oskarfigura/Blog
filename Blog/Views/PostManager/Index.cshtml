@@ -97,7 +97,7 @@
                                 @Html.DisplayFor(modelItem => item.PubDate)
                             </td>
                             <td>
-                                <button onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @item.Slug})'"
+                                <button onclick="location.href = '@Url.Action("AnyPost", "Blog", new {slug = @item.Slug})'"
                                         type="button" class="btn-cust btn-cust--small btn-cust--pill">
                                     View
                                 </button>

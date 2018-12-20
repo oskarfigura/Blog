@@ -7,10 +7,12 @@
 {
 
     <li>
-        <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">My Profile</a>
+        <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Profile">
+            Profile: <i>@UserManager.GetUserName(User)</i>
+        </a>
     </li>
     <li>
-        <form asp-area="Identity" asp-page="/Account/Logout" 
+        <form asp-area="Identity" asp-page="/Account/Logout"
               asp-route-returnUrl="@Url.Page("/Index", new {area = ""})" method="post" id="logoutForm" asp-antiforgery="true">
             <a href="javascript:document.getElementById('logoutForm').submit()" title="Sign out">Sign out</a>
         </form>
