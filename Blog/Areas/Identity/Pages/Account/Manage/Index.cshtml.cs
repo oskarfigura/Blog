@@ -51,10 +51,12 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
             public string DisplayName { get; set; }
 
             [Required]
+            [DataType(DataType.EmailAddress)]
             [EmailAddress]
             public string Email { get; set; }
 
             [Phone]
+            [DataType(DataType.PhoneNumber)]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
         }
@@ -86,6 +88,7 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -136,6 +139,7 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
             return RedirectToPage();
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostSendVerificationEmailAsync()
         {
             if (!ModelState.IsValid)

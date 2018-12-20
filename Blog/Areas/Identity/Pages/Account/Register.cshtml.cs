@@ -94,6 +94,9 @@ namespace Blog.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
+                    //Add a user to the default role "Follower"
+                    await _userManager.AddToRoleAsync(user, "Follower");
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",

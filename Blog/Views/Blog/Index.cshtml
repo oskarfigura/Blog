@@ -7,9 +7,10 @@
 
 <section class="s-content">
     @if (!@Model.BlogPosts.Any()) 
-    { 
-        <h1 class="s-content__header-title">This blog doesn't have any posts.</h1>
-    } 
+    { <div class="row s-content__header">
+          <h1>This blog doesn't have any posts.</h1>
+      </div>
+    }
     <div class="row masonry-wrap">
         <div class="masonry">
 
