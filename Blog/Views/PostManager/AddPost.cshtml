@@ -17,21 +17,20 @@
             <div class="form-field">
                 <label asp-for="Title" class="control-label"></label>
                 <input asp-for="Title" class="full-width" type="text" required="required"
-                       data-msg="Please enter a title." placeholder="Title"/>
+                       name="Title" placeholder="Title"/>
             </div>
             <div class="form-field">
                 <label asp-for="Slug"></label>
                 <em>This is the part of the URL that will be used to identify this post</em>
                 <input asp-for="Slug" class="full-width" type="text" required="required"
-                       data-msg="Please enter a slug." placeholder="Slug"/>
+                       name="Slug" placeholder="Slug"/>
             </div>
 
             <div class="form-field">
                 <label asp-for="Description"></label>
                 <em>Short post description displayed on home-page</em>
                 <textarea asp-for="Description" class="form-control" required="required"
-                          data-msg="Post description cannot be empty." 
-                            style="resize: vertical;" rows="5" 
+                          name="Description" style="resize: vertical;" rows="5" 
                             placeholder="Post description">
                 </textarea>
             </div>
@@ -64,6 +63,40 @@
                 var contentEditor = $('.summernote');
 
                 var postFormValidation = postForm.validate({
+                    rules: {
+                        "Description": {
+                            required: true,
+                            minlength: 3,
+                            maxlength: 300
+                        },
+                        "Title": {
+                            required: true,
+                            minlength: 3,
+                            maxlength: 100
+                        },
+                        "Slug": {
+                            required: true,
+                            minlength: 1,
+                            maxlength: 100
+                        }
+                    },
+                    messages: {
+                        "Description": {
+                            required: "Post description cannot be empty.",
+                            minlength: "Minimum length of 3 characters.",
+                            maxlength: "Maximum length of 300 characters."
+                        },
+                        "Title": {
+                            required: "Post title cannot be empty.",
+                            minlength: "Minimum length of 3 characters.",
+                            maxlength: "Maximum length of 100 characters."
+                        },
+                        "Slug": {
+                            required: "Post slug cannot be empty.",
+                            minlength: "Minimum length of 1 character.",
+                            maxlength: "Maximum length of 100 characters."
+                        }  
+                    },
                     errorElement: "div",
                     errorClass: 'is-invalid',
                     validClass: 'is-valid',

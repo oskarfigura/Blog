@@ -15,7 +15,6 @@ namespace Blog.Controllers
     {
         private const string CommentsSection = "#comments";
         private const int TitleHomePageCharLimit = 30;
-        private const int DescriptionHomePageCharLimit = 300;
         private const string TruncateSymbol = "...";
 
         private readonly IPostRepo _postRepo;
@@ -143,7 +142,6 @@ namespace Blog.Controllers
         {
             foreach (var post in posts)
             {
-                post.Description = TruncatePostDescription(post.Description);
                 post.Title = TruncatePostTitle(post.Title);
             }
 
@@ -151,18 +149,6 @@ namespace Blog.Controllers
             {
                 BlogPosts = posts.OrderByDescending(p => p.PubDate)
             });
-        }
-
-        private static string TruncatePostDescription(string description)
-        {
-            if (string.IsNullOrEmpty(description) ||
-                description.Length < DescriptionHomePageCharLimit)
-            {
-                return description;
-            }
-
-            description = description.Substring(0, 300);
-            return description + TruncateSymbol;
         }
 
         private static string TruncatePostTitle(string title)

@@ -12,10 +12,14 @@ namespace Blog.Models
 
         [Required]
         [Display(Name = "Slug Url")]
+        [StringLength(100, MinimumLength = 1,
+            ErrorMessage = "Post slug must be between 3 and 100 characters long!")]
         public string Slug { get; set; }
 
         [Required]
         [DataType(DataType.Text)]
+        [StringLength(100, MinimumLength = 3,
+            ErrorMessage = "Post title must be between 3 and 100 characters long!")]
         public string Title { get; set; }
 
         [Required]
@@ -23,7 +27,9 @@ namespace Blog.Models
         public string Content { get; set; }
 
         [Required]
-        [DataType(DataType.Html)]
+        [DataType(DataType.MultilineText)]
+        [StringLength(300, MinimumLength = 3,
+            ErrorMessage = "Post description must be between 3 and 300 characters long!")]
         public string Description { get; set; }
 
         [Required]

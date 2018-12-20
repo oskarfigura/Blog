@@ -22,9 +22,9 @@ namespace Blog.Controllers
         private const string MsgSomethingIsWrong = "Something went wrong. Please try again";
         private const string MsgInvalidSlug = "Slug contains reserved characters, please only use letters and spaces.";
         private const string MsgDuplicateSlug = "Slug already exists, please enter a different slug.";
-        private const string MsgPostDeleted = "Post deleted successfully.";
-        private const string MsgSearchNoResult = "Your search returned no result.";
-        private const string MsgBlogIsEmpty = "There are currently no posts on this blog.";
+        private const string MsgPostDeleted = "Post deleted successfully. ";
+        private const string MsgSearchNoResult = "Your search returned no result. ";
+        private const string MsgBlogIsEmpty = "There are currently no posts on this blog. ";
         private const string ModelStateErrorMsgKey = "errorMsg";
 
         private readonly IPostRepo _postRepo;
