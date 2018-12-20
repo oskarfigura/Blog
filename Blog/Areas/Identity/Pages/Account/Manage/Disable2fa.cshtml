@@ -4,23 +4,26 @@
     ViewData["Title"] = "Disable two-factor authentication (2FA)";
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
+<div class="row">
+    <div class="col-md-offset-3 col-md-6">
+        @Html.Partial("_StatusMessage", Model.StatusMessage)
+        <h2>@ViewData["Title"]</h2>
 
-@Html.Partial("_StatusMessage", Model.StatusMessage)
-<h2>@ViewData["Title"]</h2>
+        <div class="alert alert-warning" role="alert">
+            <p>
+                <strong>This action only disables 2FA.</strong>
+            </p>
+            <p>
+                Disabling 2FA does not change the keys used in authenticator apps. If you wish to change the key
+                used in an authenticator app you should <a asp-page="./ResetAuthenticator">reset your authenticator keys.</a>
+            </p>
+        </div>
 
-<div class="alert alert-warning" role="alert">
-    <p>
-        <span class="glyphicon glyphicon-warning-sign"></span>
-        <strong>This action only disables 2FA.</strong>
-    </p>
-    <p>
-        Disabling 2FA does not change the keys used in authenticator apps. If you wish to change the key
-        used in an authenticator app you should <a asp-page="./ResetAuthenticator">reset your authenticator keys.</a>
-    </p>
-</div>
-
-<div>
-    <form method="post" class="form-group">
-        <button class="btn btn-danger" type="submit">Disable 2FA</button>
-    </form>
+        <div>
+            <form method="post" class="form-group" asp-antiforgery="true">
+                <button class="btn-cust btn-cust--stroke full-width" 
+                        type="submit">Disable 2FA</button>
+            </form>
+        </div>
+    </div>
 </div>

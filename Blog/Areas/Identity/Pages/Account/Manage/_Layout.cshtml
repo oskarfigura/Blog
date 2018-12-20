@@ -7,11 +7,12 @@
     <div class="row s-content__header">
         <h1>Manage your account</h1>
         <p class="lead">Change your account settings</p>
-        <partial name="_ManageNav" />
+        <partial name="_ManageNav"/>
     </div>
-    @RenderBody()
+    <div class="row">
+        @RenderBody()
+    </div>
 </section>
 
 @section Scripts {
-    @RenderSection("Scripts", required: false)
-}
+    @RenderSection("Scripts", required: false)}
