@@ -22,14 +22,6 @@ body {
     padding: 0;
 }
 
-
-/* ------------------------------------------------------------------- 
- * ## QRCodeGenerator
- * ------------------------------------------------------------------- */
-
-#qrCode { margin: 15px; }
-
-
 /* ------------------------------------------------------------------- 
  * ## links
  * ------------------------------------------------------------------- */
@@ -681,6 +673,7 @@ textarea:-webkit-autofill:focus, select:-webkit-autofill, select:-webkit-autofil
  * # buttons
  *
  * ------------------------------------------------------------------- */
+
 .btn-cust,
 input[type="submit"],
 input[type="reset"],
@@ -1349,6 +1342,10 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     overflow: hidden;
 }
 
+.masonry .entry__header {
+
+}
+
 .masonry .entry__thumb-link img {
     vertical-align: bottom;
     -webkit-transition: all 0.3s ease-in-out;
@@ -1426,11 +1423,19 @@ button::-moz-focus-inner, input::-moz-focus-inner {
     line-height: 1.375;
     margin-top: 0;
     margin-bottom: 2.1rem;
+    height: 65px;
+    overflow-y: hidden;
 }
 
 .masonry .entry__title a {
     color: #000000;
     border-bottom: 1px solid transparent;
+}
+
+p.postDate {
+    margin-bottom: 0;
+    color: #858585;
+    font-family: "metropolis-medium", sans-serif;
 }
 
 .masonry .entry__title a:hover, .masonry .entry__title a:focus { border-bottom: 1px solid rgba(0, 0, 0, 0.15); }
@@ -1447,6 +1452,8 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 .masonry .entry__excerpt {
     font-size: 1.5rem;
     line-height: 1.8;
+    height: 300px;
+    overflow-y: hidden;
 }
 
 .masonry .entry__meta {
@@ -3382,9 +3389,7 @@ footer h4::after {
 }
 
 
-.form-field.postTools {
-    display: inline-block;
-}
+.form-field.postTools { display: inline-block; }
 
 
 
@@ -3392,6 +3397,7 @@ footer h4::after {
  * responsive:
  * blog styles
  * ------------------------------------------------------------------- */
+
 @media only screen and (max-width: 1200px) {
     .s-content--narrow .s-content__header { padding: 0 6rem; }
 
@@ -3518,7 +3524,6 @@ footer h4::after {
     position: relative;
     list-style: none;
     margin: 0;
-
 }
 
 .comment__avatar {

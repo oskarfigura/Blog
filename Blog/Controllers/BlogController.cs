@@ -32,7 +32,7 @@ namespace Blog.Controllers
         {
             var posts = await _postRepo.GetAllPublishedPosts();
 
-            return View(CreateBlogViewModel(posts));
+            return View(CreateBlogViewModel(posts.ToList()));
         }
 
         // GET: Blog/Post, view with post from slug (only published)
@@ -139,12 +139,36 @@ namespace Blog.Controllers
             });
         }
 
-        private static BlogViewModel CreateBlogViewModel(IEnumerable<Post> posts)
+        private static BlogViewModel CreateBlogViewModel(IList<Post> posts)
         {
+            foreach (var post in posts)
+            {
+                post.Description = TruncatePostDescription(post.Description);
+                post.Title = TruncatePostTitle(post.Title);
+            }
+
             return (new BlogViewModel()
             {
                 BlogPosts = posts.OrderByDescending(p => p.PubDate)
             });
+        }
+
+        private static string TruncatePostDescription(string description)
+        {
+            if (string.IsNullOrEmpty(description) || description.Length < 300)
+            {
+                return description;
+            }
+
+            description = description.Substring(0, 300);
+            return description + "...";
+        }
+
+        private static string TruncatePostTitle(string title)
+        {
+            if (string.IsNullOrEmpty(title) || title.Length < 30) return title;
+            title = title.Substring(0, 30);
+            return title + "...";
         }
 
         private async Task<User> GetLoggedInUser()
