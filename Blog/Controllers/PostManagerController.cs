@@ -27,6 +27,7 @@ namespace Blog.Controllers
         private const string MsgPostCreated = "Post created successfully!";
         private const string MsgPostUpdated = "Post updated successfully.";
         private const string MsgPostDeleted = "Post deleted successfully.";
+        private const string ModelStateErrorMsgKey = "error_msg";
 
         private readonly IPostRepo _postRepo;
         private readonly IUserRepo _userRepo;
@@ -89,33 +90,38 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPost(PostCreateViewModel createPostViewModel)
         {
-            var slug = BlogUtils.CreateSlug(createPostViewModel.Slug);
-
-            if (string.IsNullOrEmpty(slug))
+            if (ModelState.IsValid)
             {
-                ViewData[ViewDataManagerMsgParam] = MsgInvalidSlug;
-                return View(createPostViewModel);
+                var slug = BlogUtils.CreateSlug(createPostViewModel.Slug);
+
+                if (string.IsNullOrEmpty(slug))
+                {
+                    ModelState.AddModelError(ModelStateErrorMsgKey, MsgInvalidSlug);
+                    return View(createPostViewModel);
+                }
+
+                var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(slug);
+
+                if (!slugIsUnique)
+                {
+                    ModelState.AddModelError(ModelStateErrorMsgKey, MsgDuplicateSlug);
+                    return View(createPostViewModel);
+                }
+
+                createPostViewModel.Slug = slug;
+                var user = await GetLoggedInUser();
+                var result = await _postRepo.AddPost(createPostViewModel, user);
+
+                if (result)
+                {
+                    return Redirect(Url.Action("AnyPost", new { slug = postSlug }) + CommentsSection);
+
+                    TempData[TempDataOperationParam] = MsgPostCreated;
+                    return RedirectToAction("Index");
+                }
             }
 
-            var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(slug);
-
-            if (!slugIsUnique)
-            {
-                ViewData[ViewDataManagerMsgParam] = MsgDuplicateSlug;
-                return View(createPostViewModel);
-            }
-
-            createPostViewModel.Slug = slug;
-            var user = await GetLoggedInUser();
-            var result = await _postRepo.AddPost(createPostViewModel, user);
-
-            if (result)
-            {
-                TempData[TempDataOperationParam] = MsgPostCreated;
-                return RedirectToAction("Index");
-            }
-
-            ViewData[ViewDataManagerMsgParam] = MsgSomethingIsWrong;
+            ModelState.AddModelError(ModelStateErrorMsgKey, MsgSomethingIsWrong);
             return View(createPostViewModel);
         }
 

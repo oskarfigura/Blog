@@ -22,9 +22,9 @@ namespace Blog.Models
         public string AuthorDisplayName { get; set; }
 
         [Required]
-        [DataType(DataType.Text)]
-        [StringLength(100, MinimumLength = 3,
-        ErrorMessage = "A comment must be between 3 and 100 characters long!")]
+        [DataType(DataType.MultilineText)]
+        [StringLength(200, MinimumLength = 3,
+        ErrorMessage = "A comment must be between 3 and 200 characters long!")]
         [Display(Name = "Comment")]
         public string Content { get; set; }
 

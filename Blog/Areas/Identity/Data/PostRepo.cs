@@ -38,7 +38,7 @@ namespace Blog.Areas.Identity.Data
         public async Task<string> AddComment(Comment comment)
         {
             if (string.IsNullOrEmpty(comment.Content)) return null;
-
+            comment.Content = comment.Content.Substring(0, 200);
             await _context.Comments.AddAsync(comment);
             await _context.SaveChangesAsync();
             return comment.Id;
