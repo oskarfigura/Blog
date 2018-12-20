@@ -8,16 +8,17 @@
 <section class="s-content">
     <div class="row s-content__header">
         <h1>@ViewData["Title"]</h1>
+        <h3 class="text-danger">@Model.ResultMsg</h3>
         <hr/>
     </div>
+    @Html.HiddenFor(model => model.ResultStatus)
 
     <div class="row">
-        <form asp-action="Index" asp-controller="AccountManager"
-              asp-antiforgery="true" method="post" id="searchForm">
+        <form asp-action="Index" method="get">
             <div class="form-field">
-                <label for="inputSearchUserName">Find by username:</label>               
+                <label>Find by username:</label>               
                 <input asp-for="AccountSearch.UserName" class="full-width" type="text"
-                        placeholder="Search by username" id="inputSearchUserName"/>
+                        placeholder="Search by username"/>
             </div>
 
             <div class="form-field">
@@ -27,7 +28,6 @@
                     Model.AvailableIdentityRoles.Select(item => new SelectListItem
                     {Value = item.Name.ToString(), Text = item.Name.ToString(),}),
                     "All Roles", new {@class = "full-width", @id = "filterByRole"})
-
             </div>
             <button type="submit" class="btn-cust">Search</button>
         </form>
@@ -158,14 +158,6 @@
                             }
                         });
                 });
-            });
-        </script>
-    }
-    @if (ViewData["AccManagerMessage"] != null)
-    {
-        <script>
-            $(document).ready(function() {
-                swal("@ViewData["AccManagerMessage"]", { icon: "info" });
             });
         </script>
     }

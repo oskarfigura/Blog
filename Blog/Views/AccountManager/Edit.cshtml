@@ -7,6 +7,7 @@
 <section class="s-content">
     <div class="row s-content__header">
         <h1>@ViewData["Title"]</h1>
+        <h3 class="text-danger">@Html.ValidationMessage("errorMsg")</h3>
         <hr/>
     </div>
 
@@ -64,12 +65,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial"/>
-    @if (ViewData["EditResult"] != null)
-    {
-        <script>
-            $(document).ready(function() {
-                swal("@ViewData["EditResult"]", { icon: "info" });
-            });
-        </script>
-    }
 }

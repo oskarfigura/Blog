@@ -216,7 +216,7 @@ namespace Blog.Controllers
             return deleteResult ? MsgPostDeleted : "";
         }
 
-        private static string GetSearchResultMsg(string currentMessage, 
+        private static string GetSearchResultMsg(string currentMessage,
             PostManagerSearch searchData, bool anyPosts)
         {
             if (anyPosts) return currentMessage;

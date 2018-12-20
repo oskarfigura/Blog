@@ -17,12 +17,12 @@
             if (Model.SearchData != null)
             {
                 <button onclick="location.href = '@Url.Action("Index", "PostManager")'"
-                        type="button"  class="btn-cust">
+                        type="button" class="btn-cust">
                     View all posts
                 </button>
             }
             <button onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
-                     type="button" class="btn-cust btn-cust--success">
+                    type="button" class="btn-cust btn-cust--success">
                 Create New Post
             </button>
         }
@@ -32,8 +32,7 @@
     {
         <div class="row">
             <div class="form-field">
-                @using (Html.BeginForm("Index", "PostManager", FormMethod.Get))
-                {
+                <form asp-action="Index" asp-controller="PostManager" method="get">
                     <div class="form-field">
                         <label for="inputPostTitle">Find by post title:</label>
                         <input asp-for="SearchData.PostTitle" class="full-width" type="text"
@@ -51,7 +50,7 @@
                             class="btn-cust btn-cust--success">
                         Create New Post
                     </button>
-                }
+                </form>
             </div>
         </div>
         <div class="row">
@@ -92,8 +91,7 @@
                                 @Html.DisplayFor(modelItem => item.PubDate)
                             </td>
                             <td>
-                                <button onclick="location.href = 
-                                        '@Url.Action("AnyPost", "Blog", new {slug = @item.Slug})'"
+                                <button onclick="location.href = '@Url.Action("AnyPost", "Blog", new {slug = @item.Slug})'"
                                         type="button" class="btn-cust btn-cust--small btn-cust--pill">
                                     View
                                 </button>
