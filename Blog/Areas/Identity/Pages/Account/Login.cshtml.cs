@@ -83,7 +83,11 @@ namespace Blog.Areas.Identity.Pages.Account
                 }
                 if (result.RequiresTwoFactor)
                 {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                    if (Url.IsLocalUrl(returnUrl))
+                    {
+                        return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                    }
+                    return RedirectToAction("Index", "Blog");
                 }
                 if (result.IsLockedOut)
                 {

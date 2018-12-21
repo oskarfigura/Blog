@@ -49,12 +49,7 @@ namespace Blog
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-//            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-//                .AddCookie(options =>
-//                {
-//                    options.SlidingExpiration = false;
-//                    options.ExpireTimeSpan = TimeSpan.MinValue;
-//                }); 
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 
             services.AddAuthorization(options =>
             {
@@ -89,12 +84,12 @@ namespace Blog
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-//            var cookiePolicyOptions = new CookiePolicyOptions
-//            {
-//                HttpOnly = HttpOnlyPolicy.Always,
-//                Secure = CookieSecurePolicy.Always
-//            };
-//            app.UseCookiePolicy(cookiePolicyOptions);
+            var cookiePolicyOptions = new CookiePolicyOptions
+            {
+                HttpOnly = HttpOnlyPolicy.Always,
+                Secure = CookieSecurePolicy.Always
+            };
+            app.UseCookiePolicy(cookiePolicyOptions);
 
             app.UseMvc(routes =>
             {
