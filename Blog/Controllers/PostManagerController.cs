@@ -137,7 +137,7 @@ namespace Blog.Controllers
             if (ModelState.IsValid)
             {
                 var slug = BlogUtils.CreateSlug(postEditViewModel.Slug);
-
+                
                 if (string.IsNullOrEmpty(slug))
                 {
                     ModelState.AddModelError(ModelStateErrorMsgKey, MsgInvalidSlug);
@@ -151,7 +151,7 @@ namespace Blog.Controllers
                     ModelState.AddModelError(ModelStateErrorMsgKey, MsgDuplicateSlug);
                     return View(postEditViewModel);
                 }
-
+                postEditViewModel.Slug = slug;
                 var updateResult = await _postRepo.UpdatePost(postEditViewModel);
                 if (updateResult) return Redirect(Url.Action("AnyPost", "Blog", new {slug}));
             }
