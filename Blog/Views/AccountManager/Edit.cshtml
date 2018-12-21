@@ -4,91 +4,65 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container-fluid">
-    @using (Html.BeginForm())
-    {
-        @Html.AntiForgeryToken()
-        {
+<section class="s-content">
+    <div class="row s-content__header">
+        <h1>@ViewData["Title"]</h1>
+        <h3 class="text-danger">@Html.ValidationMessage("errorMsg")</h3>
+        <hr/>
+    </div>
+
+    <div class="row">
+        <form asp-action="Edit" asp-antiforgery="true" method="post">
             <div class="form-horizontal">
-                <h3>Edit account: @Html.DisplayFor(model => model.UserAccount.UserName)</h3>
-                <hr/>
-                @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+                <h3>Edit account: @Model.UserAccount.UserName</h3>
+                <hr />
                 @Html.HiddenFor(model => model.UserAccount.Id)
                 @Html.HiddenFor(model => model.UserAccount.UserName)
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.UserAccount.Name,
-                        htmlAttributes: new {@class = "control-label col-md-2"})
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.UserAccount.Name,
-                            new {htmlAttributes = new {@class = "form-control"}})
-                        @Html.ValidationMessageFor(model => model.UserAccount.Name, "",
-                            new {@class = "text-danger"})
-                    </div>
+                <div class="form-field">
+                    <label asp-for="UserAccount.Name"></label>
+                    <input asp-for="UserAccount.Name" 
+                           class="full-width" type="text" placeholder="Full Name"/>
+                    <span asp-validation-for="UserAccount.Name" class="text-danger"></span>
                 </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.UserAccount.DisplayName,
-                        htmlAttributes: new {@class = "control-label col-md-2"})
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.UserAccount.DisplayName,
-                            new {htmlAttributes = new {@class = "form-control"}})
-                        @Html.ValidationMessageFor(model => model.UserAccount.DisplayName, "",
-                            new {@class = "text-danger"})
-                    </div>
+                <div class="form-field">
+                    <label asp-for="UserAccount.DisplayName"></label>
+                    <input asp-for="UserAccount.DisplayName" 
+                           class="full-width" type="text" placeholder="Display Name"/>
+                    <span asp-validation-for="UserAccount.DisplayName" class="text-danger"></span>
                 </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.UserAccount.Email,
-                        htmlAttributes: new {@class = "control-label col-md-2"})
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.UserAccount.Email,
-                            new {htmlAttributes = new {@class = "form-control"}})
-                        @Html.ValidationMessageFor(model => model.UserAccount.Email, "",
-                            new {@class = "text-danger"})
-                    </div>
+                <div class="form-field">
+                    <label asp-for="UserAccount.Email"></label>
+                    <input asp-for="UserAccount.Email" 
+                           class="full-width" type="text" placeholder="Email"/>
+                    <span asp-validation-for="UserAccount.Email" class="text-danger"></span>
                 </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.UserAccount.PhoneNumber,
-                        htmlAttributes: new {@class = "control-label col-md-2"})
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.UserAccount.PhoneNumber,
-                            new {htmlAttributes = new {@class = "form-control"}})
-                        @Html.ValidationMessageFor(model => model.UserAccount.PhoneNumber, "",
-                            new {@class = "text-danger"})
-                    </div>
+                <div class="form-field">
+                    <label asp-for="UserAccount.PhoneNumber"></label>
+                    <input asp-for="UserAccount.PhoneNumber" 
+                           class="full-width" type="text" placeholder="Phone Number"/>
+                    <span asp-validation-for="UserAccount.PhoneNumber" class="text-danger"></span>
                 </div>
 
-                <div class="form-group">
-                    @Html.LabelFor(model => model.UserAccount.Role,
-                        htmlAttributes: new {@class = "control-label col-md-2"})
-                    <div class="col-md-10">
-                        @Html.DropDownListFor(x => Model.UserAccount.Role,
-                            new SelectList(Model.AvailableIdentityRoles), new {@class = "form-control"})
-                    </div>
+                <div class="form-field">
+                    <label asp-for="UserAccount.Role"></label>
+                    @Html.DropDownListFor(x => Model.UserAccount.Role,
+                        new SelectList(Model.AvailableIdentityRoles), new {@class = "full-width"})
                 </div>
 
-                <div class="form-group">
-                    <div class="col-md-offset-2 col-md-10">
-                        @Html.ActionLink("Back to List", "Index", new {},
-                            new {@class = "btn btn-default"})
-                        <input type="submit" value="Save" class="btn btn-success"/>
-                    </div>
+                <div class="form-field">
+                    @Html.ActionLink("Back to List", "Index", new {},
+                        new {@class = "btn-cust btn-cust--danger" })
+                    <input type="submit" value="Save" class="btn-cust btn-cust--success" />
                 </div>
             </div>
-        }
-    }
-</div>
+        </form>
+    </div>
+</section>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial"/>
-    @if (ViewData["EditResult"] != null)
-    {
-        <script>
-            $(document).ready(function() {
-                swal("@ViewData["EditResult"]", { icon: "info" });
-            });
-        </script>
-    }
 }

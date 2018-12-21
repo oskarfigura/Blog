@@ -51,7 +51,7 @@ namespace Blog.Areas.Identity.Pages.Account
 
             return Page();
         }
-
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             if (!ModelState.IsValid)

@@ -3,8 +3,6 @@
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Oops!</h1>
-
 @if (Model.ShowRequestId)
 {
     var errorMessage = "";
@@ -39,6 +37,12 @@ else
     ViewData["ErrorMessage"] = "An error occurred while processing your request.";
 }
 
-<h2 class="text-danger">
-    @ViewData["ErrorMessage"]
-</h2>
+<section class="s-content">
+    <article class="row format-standard">
+        <div class="s-content__header col-full">
+            <h1 class="s-content__header-title">
+                @ViewData["ErrorMessage"]
+            </h1>
+        </div>
+    </article>
+</section>

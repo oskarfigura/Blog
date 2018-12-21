@@ -92,7 +92,7 @@ namespace Blog.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasMaxLength(100);
+                        .HasMaxLength(200);
 
                     b.Property<string>("PostId")
                         .IsRequired();
@@ -121,7 +121,8 @@ namespace Blog.Migrations
                         .IsRequired();
 
                     b.Property<string>("Description")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(300);
 
                     b.Property<DateTime>("EditDate");
 
@@ -130,10 +131,12 @@ namespace Blog.Migrations
                     b.Property<DateTime>("PubDate");
 
                     b.Property<string>("Slug")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.Property<string>("Title")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasMaxLength(100);
 
                     b.HasKey("Id");
 

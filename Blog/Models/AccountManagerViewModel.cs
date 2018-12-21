@@ -11,8 +11,17 @@ namespace Blog.Models
      */
     public class AccountManagerViewModel
     {
-        public IEnumerable<User> Accounts { get; set; }
-        public IEnumerable<IdentityRole> AvailableIdentityRoles { get; set; }
+        public ICollection<User> Accounts { get; set; }
+        public ICollection<IdentityRole> AvailableIdentityRoles { get; set; }
         public AccountSearch AccountSearch { get; set; }
+        public string ResultMsg { get; set; }
+        public int ResultStatus { get; set; }
+
+        public enum ResultStatusList
+        {
+            UserDeleted = 1,
+            UnexpectedError = 2,
+            CannotDeleteYourself = 3
+        };
     }
 }

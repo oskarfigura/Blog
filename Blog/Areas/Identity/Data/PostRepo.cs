@@ -38,20 +38,19 @@ namespace Blog.Areas.Identity.Data
         public async Task<string> AddComment(Comment comment)
         {
             if (string.IsNullOrEmpty(comment.Content)) return null;
-
             await _context.Comments.AddAsync(comment);
             await _context.SaveChangesAsync();
             return comment.Id;
         }
 
-        public async Task<IEnumerable<Post>> GetAllPosts()
+        public async Task<ICollection<Post>> GetAllPosts()
         {
             var postList = await _context.Posts.AsNoTracking()
                 .Include(p => p.Comments).ToListAsync();
             return postList ?? new List<Post>();
         }
 
-        public async Task<IEnumerable<Post>> GetAllPublishedPosts()
+        public async Task<ICollection<Post>> GetAllPublishedPosts()
         {
             var postList = await _context.Posts.Where(p => p.IsPublished).AsNoTracking()
                 .Include(p => p.Comments).ToListAsync();
@@ -80,7 +79,7 @@ namespace Blog.Areas.Identity.Data
             return post.DefaultIfEmpty(new Post()).FirstOrDefault();
         }
 
-        public async Task<IEnumerable<Post>> GetPostsBySearchData(PostManagerSearch searchData)
+        public async Task<ICollection<Post>> GetPostsBySearchData(PostManagerSearch searchData)
         {
             var postList = await GetAllPosts();
 
@@ -93,10 +92,10 @@ namespace Blog.Areas.Identity.Data
                 case (int)PostManagerSearch.PublishStatusList.Any:
                     break;
                 case (int)PostManagerSearch.PublishStatusList.Published:
-                    postList = postList.Where(p => p.IsPublished);
+                    postList = postList.Where(p => p.IsPublished).ToList();
                     break;
                 case (int)PostManagerSearch.PublishStatusList.Unpublished:
-                    postList = postList.Where(p => !p.IsPublished);
+                    postList = postList.Where(p => !p.IsPublished).ToList();
                     break;
                 default:
                     break;
@@ -105,7 +104,7 @@ namespace Blog.Areas.Identity.Data
             if (!string.IsNullOrEmpty(searchData.PostTitle))
             {
                 postList = postList.Where(p => p.Title.Contains(searchData.PostTitle,
-                    StringComparison.OrdinalIgnoreCase));
+                    StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
             return postList;

@@ -3,56 +3,68 @@
     ViewData["Title"] = "Edit Post";
 }
 
-<h2>@ViewData["Title"]</h2>
+<section class="s-content">
+    <div class="row s-content__header">
+        <h1>@ViewData["Title"]</h1>
+        <h3 class="text-danger">@Html.ValidationMessage("errorMsg")</h3>
+        <hr/>
+    </div>
 
-<hr />
-<div class="row">
-    <div class="col-md-12">
+    <div class="row">
         <form asp-action="Edit" asp-antiforgery="true" class="postForm" method="post"
               novalidate="novalidate">
-            <input asp-for="PostId" type="hidden" />
+            <input asp-for="PostId" type="hidden"/>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" type="text" required="required"
-                       data-msg="Please enter a title." />
+
+            <div class="form-field">
+                <label asp-for="Title"></label>
+                <input asp-for="Title" class="full-width" type="text"
+                       name="Title" placeholder="Title"/>
             </div>
-            <div class="form-group">
-                <label asp-for="Slug" class="control-label"></label>
-                <p>This is the part of the URL that will be used to identify this post</p>
-                <input asp-for="Slug" class="form-control" type="text" required="required"
-                       data-msg="Please enter a slug." />
+
+            <div class="form-field">
+                <label asp-for="Slug"></label>
+                <em>This is the part of the URL that will be used to identify this post</em>
+                <input asp-for="Slug" class="full-width" type="text"
+                       name="Slug" placeholder="Slug"/>
             </div>
-            <div class="form-group">
-                <label asp-for="Published"></label>
-                <input asp-for="Published" type="checkbox" />
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <p>Short post description displayed on home-page</p>
-                <textarea asp-for="Description" class="form-control" required="required"
-                          data-msg="Post description cannot be empty." style="resize: vertical;" rows="5">
+
+            <div class="form-field">
+                <label asp-for="Description"></label>
+                <em>Short post description displayed on home-page</em>
+                <textarea asp-for="Description" class="form-control"
+                    placeholder="Description" name="Description" 
+                    style="resize: vertical;" rows="5">
                 </textarea>
             </div>
+
             <div class="form-group">
-                <label asp-for="Content" class="control-label"></label>
+                <label asp-for="Content"></label>
                 <textarea asp-for="Content" class="summernote form-control" required="required"
                           data-msg="Post content cannot be empty." style="display: none;">
                 </textarea>
             </div>
 
-            <div class="form-group">
-                <button onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @Model.Slug})'"
-                    type="button" class="btn btn-danger">Back to post
+            <label class="form-field add-bottom">
+                <span class="label-text">Publish post?</span>
+                <input asp-for="Published" type="checkbox"/>
+            </label>
+
+            <div class="form-field">
+                <button onclick="location.href = '@Url.Action("AnyPost", "Blog", new {slug = @Model.Slug})'"
+                        type="button" class="btn-cust btn-cust--danger">
+                    Back to post
                 </button>
-                <input type="submit" value="Save Changes" class="btn btn-success" id="btnSubmit" />
+                <input type="submit" value="Save Changes" class="btn-cust btn-cust--success" id="btnSubmit"/>
             </div>
         </form>
     </div>
-</div>
+</section>
 
 @section Scripts {
-    <script src="@Url.Content("https://cdn.jsdelivr.net/npm/jquery-validation@1.14.0/dist/jquery.validate.min.js")"></script>
+    <script src="@Url.Content("https://cdn.jsdelivr.net/npm/jquery-validation@1.14.0/dist/jquery.validate.min.js")">
+
+    </script>
 
     <script>
         $(document).ready(function() {
@@ -61,6 +73,40 @@
                 var contentEditor = $('.summernote');
 
                 var postFormValidation = postForm.validate({
+                    rules: {
+                        "Description": {
+                            required: true,
+                            minlength: 3,
+                            maxlength: 300
+                        },
+                        "Title": {
+                            required: true,
+                            minlength: 3,
+                            maxlength: 100
+                        },
+                        "Slug": {
+                            required: true,
+                            minlength: 1,
+                            maxlength: 100
+                        }
+                    },
+                    messages: {
+                        "Description": {
+                            required: "Post description cannot be empty.",
+                            minlength: "Minimum length of 3 characters.",
+                            maxlength: "Maximum length of 300 characters."
+                        },
+                        "Title": {
+                            required: "Post title cannot be empty.",
+                            minlength: "Minimum length of 3 characters.",
+                            maxlength: "Maximum length of 100 characters."
+                        },
+                        "Slug": {
+                            required: "Post slug cannot be empty.",
+                            minlength: "Minimum length of 1 character.",
+                            maxlength: "Maximum length of 100 characters."
+                        }
+                    },
                     errorElement: "div",
                     errorClass: 'is-invalid',
                     validClass: 'is-valid',
@@ -93,12 +139,4 @@
             });
         });
     </script>
-    @if (ViewData["PostManagerMessage"] != null)
-    {
-        <script>
-            $(document).ready(function() {
-                swal("@ViewData["PostManagerMessage"]", { icon: "info" });
-            });
-        </script>
-    }
 }

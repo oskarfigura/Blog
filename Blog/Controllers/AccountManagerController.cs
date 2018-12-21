@@ -10,16 +10,14 @@ namespace Blog.Controllers
     [Authorize(Policy = "CanAccessAccountManager")]
     public class AccountManagerController : Controller
     {
-        private const string TempDataOperationParam = "UserOperationResult";
-        private const string ViewDataManagerMsgParam = "AccManagerMessage";
-        private const string ViewDataEditResult = "EditResult";
         private const string MsgUnexpectedError = "Something went wrong. Please try again.";
-        private const string MsgUserUpdated = "User updated successfully!";
         private const string MsgUserDeleted = "User deleted successfully.";
         private const string MsgDuplicateEmail = "Email already exists, please enter a different email.";
 
         private const string MsgCannotDeleteYourself = "You cannot delete yourself from account manager! " +
                                                        "Please do it in your profile settings.";
+
+        private const string ModelStateErrorMsgKey = "errorMsg";
 
         private readonly IUserRepo _userRepo;
 
@@ -28,24 +26,13 @@ namespace Blog.Controllers
             _userRepo = userRepo;
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index(AccountManagerViewModel accountManagerViewModel)
         {
             var accountSearchData = accountManagerViewModel.AccountSearch;
+            var message = GetResultMsg(accountManagerViewModel.ResultStatus);
 
-            //Get any result messages from CRUD operations on accounts
-            if (TempData[TempDataOperationParam] != null)
-            {
-                ViewData[ViewDataManagerMsgParam] =
-                    TempData[TempDataOperationParam].ToString();
-            }
-
-            return View(new AccountManagerViewModel
-            {
-                Accounts = await _userRepo
-                    .GetUsersBySearchData(accountManagerViewModel.AccountSearch),
-                AvailableIdentityRoles = await _userRepo.GetAllRoles(),
-                AccountSearch = accountSearchData
-            });
+            return View(await CreateAccountManagerViewModel(accountSearchData, message));
         }
 
         // GET: AccountManager/Details, view with account details 
@@ -102,26 +89,27 @@ namespace Blog.Controllers
             //Populate available list of roles after form post cleared the list
             accountViewModel.AvailableIdentityRoles = await _userRepo.GetAllRoles();
 
-            if (accountViewModel.UserAccount == null)
+            if (ModelState.IsValid)
             {
-                ViewData[ViewDataEditResult] = MsgUnexpectedError;
-                return View(accountViewModel);
+                var emailIsUnique = await _userRepo
+                    .CheckIfEmailIsUnique(accountViewModel.UserAccount.Email,
+                        accountViewModel.UserAccount.Id);
+
+                if (!emailIsUnique)
+                {
+                    ModelState.AddModelError(ModelStateErrorMsgKey, MsgDuplicateEmail);
+                    return View(accountViewModel);
+                }
+
+                var result = await _userRepo.UpdateUser(accountViewModel.UserAccount);
+                if (result)
+                {
+                    return RedirectToAction("Details",
+                        new {userName = accountViewModel.UserAccount.UserName});
+                }
             }
 
-            var emailIsUnique = await _userRepo
-                .CheckIfEmailIsUnique(accountViewModel.UserAccount.Email,
-                    accountViewModel.UserAccount.Id);
-
-            if (!emailIsUnique)
-            {
-                ViewData[ViewDataEditResult] = MsgDuplicateEmail;
-                return View(accountViewModel);
-            }
-
-            ViewData[ViewDataEditResult] = MsgUserUpdated;
-            var result = await _userRepo.UpdateUser(accountViewModel.UserAccount);
-            if (!result) ViewData[ViewDataEditResult] = MsgUnexpectedError;
-
+            ModelState.AddModelError(ModelStateErrorMsgKey, MsgUnexpectedError);
             return View(accountViewModel);
         }
 
@@ -135,20 +123,32 @@ namespace Blog.Controllers
 
             if (userName.Equals(user.UserName))
             {
-                TempData[TempDataOperationParam] = MsgCannotDeleteYourself;
-                return RedirectToAction("Index");
+                return RedirectToAction("Index",
+                    new
+                    {
+                        ResultStatus = (int)AccountManagerViewModel
+                            .ResultStatusList.CannotDeleteYourself
+                    });
             }
 
             var deleteResult = await _userRepo.DeleteUser(userName);
 
             if (deleteResult)
             {
-                TempData[TempDataOperationParam] = MsgUserDeleted;
-                return RedirectToAction("Index");
+                return RedirectToAction("Index",
+                    new
+                    {
+                        ResultStatus = (int)AccountManagerViewModel
+                            .ResultStatusList.UserDeleted
+                    });
             }
 
-            TempData[TempDataOperationParam] = MsgUnexpectedError;
-            return RedirectToAction("Index");
+            return RedirectToAction("Index",
+                new
+                {
+                    ResultStatus = (int)AccountManagerViewModel
+                        .ResultStatusList.UnexpectedError
+                });
         }
 
         private async Task<User> GetLoggedInUser()
@@ -156,6 +156,55 @@ namespace Blog.Controllers
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var user = await _userRepo.GetUserById(currentUserId);
             return user;
+        }
+
+        private async Task<AccountManagerViewModel> CreateAccountManagerViewModel(
+            AccountSearch accountSearchData, string message)
+        {
+            return new AccountManagerViewModel
+            {
+                Accounts = await _userRepo.GetUsersBySearchData(accountSearchData),
+                AvailableIdentityRoles = await _userRepo.GetAllRoles(),
+                AccountSearch = accountSearchData,
+                ResultMsg = message
+            };
+        }
+
+        private async Task<AccountManagerViewModel> CreateAccountManagerViewModel()
+        {
+            var searchData = new AccountSearch();
+            return new AccountManagerViewModel
+            {
+                Accounts = await _userRepo.GetUsersBySearchData(searchData),
+                AvailableIdentityRoles = await _userRepo.GetAllRoles(),
+                AccountSearch = searchData,
+                ResultMsg = ""
+            };
+        }
+
+        /**
+         * Decodes which info message should be shown to user based on operation result
+         */
+        private static string GetResultMsg(int statusValue)
+        {
+            var message = "";
+
+            switch (statusValue)
+            {
+                case (int) AccountManagerViewModel.ResultStatusList.UserDeleted:
+                    message = MsgUserDeleted;
+                    break;
+                case (int) AccountManagerViewModel.ResultStatusList.UnexpectedError:
+                    message = MsgUnexpectedError;
+                    break;
+                case (int) AccountManagerViewModel.ResultStatusList.CannotDeleteYourself:
+                    message = MsgCannotDeleteYourself;
+                    break;
+                default:
+                    break;
+            }
+
+            return message;
         }
     }
 }

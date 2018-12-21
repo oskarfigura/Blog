@@ -34,6 +34,7 @@ namespace Blog.Areas.Identity.Pages.Account
             public string Email { get; set; }
         }
 
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostAsync()
         {
             if (ModelState.IsValid)

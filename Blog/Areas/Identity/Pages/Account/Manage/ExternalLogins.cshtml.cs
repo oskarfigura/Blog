@@ -47,7 +47,7 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
             ShowRemoveButton = user.PasswordHash != null || CurrentLogins.Count > 1;
             return Page();
         }
-
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostRemoveLoginAsync(string loginProvider, string providerKey)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -67,7 +67,7 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
             StatusMessage = "The external login was removed.";
             return RedirectToPage();
         }
-
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPostLinkLoginAsync(string provider)
         {
             // Clear the existing external cookie to ensure a clean login process

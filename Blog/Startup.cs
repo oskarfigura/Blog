@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
 using Blog.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -47,6 +49,13 @@ namespace Blog
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+//            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//                .AddCookie(options =>
+//                {
+//                    options.SlidingExpiration = false;
+//                    options.ExpireTimeSpan = TimeSpan.MinValue;
+//                }); 
+
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("CanComment", policy => policy.RequireClaim("CanComment", "true"));
@@ -79,7 +88,13 @@ namespace Blog
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+
+//            var cookiePolicyOptions = new CookiePolicyOptions
+//            {
+//                HttpOnly = HttpOnlyPolicy.Always,
+//                Secure = CookieSecurePolicy.Always
+//            };
+//            app.UseCookiePolicy(cookiePolicyOptions);
 
             app.UseMvc(routes =>
             {

@@ -55,7 +55,7 @@ namespace Blog.Areas.Identity.Pages.Account.Manage
 
             return Page();
         }
-
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> OnPost()
         {
             var user = await _userManager.GetUserAsync(User);

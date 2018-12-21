@@ -4,29 +4,25 @@
 
 @{
     ViewData["Title"] = "Post Manager";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<div class="container-fluid">
-    <div class="row">
-        <h2>@ViewData["Title"]</h2>
+<section class="s-content">
+    <div class="row s-content__header">
+        <h1>@ViewData["Title"]</h1>
+        <h3 class="text-danger">@Model.ResultMsg</h3>
         <hr/>
-
+    </div>
+    <div class="row">
         @if (!Model.BlogPosts.Any())
         {
             if (Model.SearchData != null)
             {
-                <h4>Your search, did not match any posts.</h4>
-                <button type="button" onclick="location.href = '@Url.Action("Index", "PostManager")'"
-                        class="btn btn-primary">
+                <button onclick="location.href = '@Url.Action("Index", "PostManager")'"
+                        type="button" class="btn-cust">
                     View all posts
                 </button>
             }
-            else
-            {
-                <h4>There are currently no posts on this blog.</h4>
-            }
-            <button type="button" onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
-                    class="btn btn-success">
+            <button onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
+                    type="button" class="btn-cust btn-cust--success">
                 Create New Post
             </button>
         }
@@ -35,31 +31,26 @@
     @if (Model.BlogPosts.Any())
     {
         <div class="row">
-            <div class="form-group">
-                @using (Html.BeginForm("Index", "PostManager", FormMethod.Get))
-                {
-                    <div class="form-group">
+            <div class="form-field">
+                <form asp-action="Index" asp-controller="PostManager" method="get">
+                    <div class="form-field">
                         <label for="inputPostTitle">Find by post title:</label>
-
-                        @Html.TextBoxFor(m => m.SearchData.PostTitle, new
-                        {
-                            @class = "form-control", @id = "inputPostTitle",
-                            @placeholder = "Search by post title"
-                        })
+                        <input asp-for="SearchData.PostTitle" class="full-width" type="text"
+                               placeholder="Search by post title" id="inputPostTitle"/>
                     </div>
-                    <div class="form-group">
+                    <div class="form-field">
                         <label>Filter posts by publish status: </label>
-                        <select asp-for="@Model.SearchData.PublishStatus"
+                        <select asp-for="SearchData.PublishStatus"
                                 asp-items="Html.GetEnumSelectList<PostManagerSearch.PublishStatusList>()"
-                                class="form-control">
+                                class="full-width">
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary">Search</button>
+                    <button type="submit" class="btn-cust">Search</button>
                     <button type="button" onclick="location.href = '@Url.Action("AddPost", "PostManager")'"
-                            class="btn btn-success">
+                            class="btn-cust btn-cust--success">
                         Create New Post
                     </button>
-                }
+                </form>
             </div>
         </div>
         <div class="row">
@@ -80,6 +71,7 @@
                             @Html.DisplayNameFor(model => model.BlogPosts.First().PubDate)
                         </th>
                         <th></th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -99,25 +91,29 @@
                                 @Html.DisplayFor(modelItem => item.PubDate)
                             </td>
                             <td>
-                                @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
+                                <button onclick="location.href = '@Url.Action("AnyPost", "Blog", new {slug = @item.Slug})'"
+                                        type="button" class="btn-cust btn-cust--small btn-cust--pill">
+                                    View
+                                </button>
+                            </td>
+                            <td>
+                                @if ((await AuthorizationService
+                                    .AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
                                 {
-                                    <button type="button" id="btnDelete-@item.Id" style="margin-right: 5px"
-                                            class="btn btn-danger btn-xs pull-right btnDeletePost">
+                                    <button class="btn-cust btn-cust--small 
+                                            btn-cust--pill btn-cust--danger btnDeletePost"
+                                            type="button" id="btnDelete-@item.Id">
                                         Delete
                                     </button>
                                 }
-                                <button type="button"
-                                        onclick="location.href = '@Url.Action("Post", "Blog", new {slug = @item.Slug})'"
-                                        class="btn btn-primary btn-xs pull-right" style="margin-right: 5px">
-                                    View
-                                </button>
                             </td>
                         </tr>
                     }
                     </tbody>
                 </table>
             </div>
-            @if ((await AuthorizationService.AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
+            @if ((await AuthorizationService
+                .AuthorizeAsync(User, "CanDeletePosts")).Succeeded)
             {
                 <form asp-controller="PostManager" asp-action="Delete"
                       method="post" id="postDeletePost" asp-antiforgery="true">
@@ -125,7 +121,7 @@
             }
         </div>
     }
-</div>
+</section>
 
 @section Scripts
 {
@@ -155,15 +151,6 @@
                             }
                         });
                 });
-            });
-        </script>
-    }
-
-    @if (ViewData["PostManagerMessage"] != null)
-    {
-        <script>
-            $(document).ready(function() {
-                swal("@ViewData["PostManagerMessage"]", { icon: "info" });
             });
         </script>
     }

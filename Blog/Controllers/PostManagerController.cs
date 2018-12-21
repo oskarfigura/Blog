@@ -19,14 +19,13 @@ namespace Blog.Controllers
     [Authorize(Policy = "CanAccessPostManager")]
     public class PostManagerController : Controller
     {
-        private const string TempDataOperationParam = "PostOperationResult";
-        private const string ViewDataManagerMsgParam = "PostManagerMessage";
         private const string MsgSomethingIsWrong = "Something went wrong. Please try again";
         private const string MsgInvalidSlug = "Slug contains reserved characters, please only use letters and spaces.";
         private const string MsgDuplicateSlug = "Slug already exists, please enter a different slug.";
-        private const string MsgPostCreated = "Post created successfully!";
-        private const string MsgPostUpdated = "Post updated successfully.";
-        private const string MsgPostDeleted = "Post deleted successfully.";
+        private const string MsgPostDeleted = "Post deleted successfully. ";
+        private const string MsgSearchNoResult = "Your search returned no result. ";
+        private const string MsgBlogIsEmpty = "There are currently no posts on this blog. ";
+        private const string ModelStateErrorMsgKey = "errorMsg";
 
         private readonly IPostRepo _postRepo;
         private readonly IUserRepo _userRepo;
@@ -42,20 +41,9 @@ namespace Blog.Controllers
         {
             //TODO Run this method to store posts which will be used for db seeding in the future
             //TODO StoreAllPostsInJsonFile();
-
-            var postSearchData = postManagerView.SearchData;
-
-            //Get any result messages from CRUD operations on posts
-            if (TempData[TempDataOperationParam] != null)
-            {
-                ViewData[ViewDataManagerMsgParam] = TempData[TempDataOperationParam].ToString();
-            }
-
-            return View(new PostManagerViewModel
-            {
-                BlogPosts = await _postRepo.GetPostsBySearchData(postSearchData),
-                SearchData = postSearchData
-            });
+            return View(await CreatePostManagerViewModel(
+                postManagerView.SearchData,
+                postManagerView.PostDeleted));
         }
 
         //TODO Delete after testing is done, only used to save posts created in web, ready for db seeding
@@ -89,33 +77,35 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddPost(PostCreateViewModel createPostViewModel)
         {
-            var slug = BlogUtils.CreateSlug(createPostViewModel.Slug);
-
-            if (string.IsNullOrEmpty(slug))
+            if (ModelState.IsValid)
             {
-                ViewData[ViewDataManagerMsgParam] = MsgInvalidSlug;
-                return View(createPostViewModel);
+                var slug = BlogUtils.CreateSlug(createPostViewModel.Slug);
+
+                if (string.IsNullOrEmpty(slug))
+                {
+                    ModelState.AddModelError(ModelStateErrorMsgKey, MsgInvalidSlug);
+                    return View(createPostViewModel);
+                }
+
+                var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(slug);
+
+                if (!slugIsUnique)
+                {
+                    ModelState.AddModelError(ModelStateErrorMsgKey, MsgDuplicateSlug);
+                    return View(createPostViewModel);
+                }
+
+                createPostViewModel.Slug = slug;
+                var user = await GetLoggedInUser();
+                var result = await _postRepo.AddPost(createPostViewModel, user);
+
+                if (result)
+                {
+                    return Redirect(Url.Action("AnyPost", "Blog", new {slug}));
+                }
             }
 
-            var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(slug);
-
-            if (!slugIsUnique)
-            {
-                ViewData[ViewDataManagerMsgParam] = MsgDuplicateSlug;
-                return View(createPostViewModel);
-            }
-
-            createPostViewModel.Slug = slug;
-            var user = await GetLoggedInUser();
-            var result = await _postRepo.AddPost(createPostViewModel, user);
-
-            if (result)
-            {
-                TempData[TempDataOperationParam] = MsgPostCreated;
-                return RedirectToAction("Index");
-            }
-
-            ViewData[ViewDataManagerMsgParam] = MsgSomethingIsWrong;
+            ModelState.AddModelError(ModelStateErrorMsgKey, MsgSomethingIsWrong);
             return View(createPostViewModel);
         }
 
@@ -144,35 +134,29 @@ namespace Blog.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(PostEditViewModel postEditViewModel)
         {
-            if (string.IsNullOrWhiteSpace(postEditViewModel.PostId))
+            if (ModelState.IsValid)
             {
-                return NotFound();
-            }
-
-            var slug = BlogUtils.CreateSlug(postEditViewModel.Slug);
-
-            if (string.IsNullOrEmpty(slug))
-            {
-                ViewData[ViewDataManagerMsgParam] = MsgInvalidSlug;
-                return View(postEditViewModel);
-            }
-
-            var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(slug, postEditViewModel.PostId);
-
-            if (slugIsUnique)
-            {
-                var updateResult = await _postRepo.UpdatePost(postEditViewModel);
-
-                if (!updateResult)
+                var slug = BlogUtils.CreateSlug(postEditViewModel.Slug);
+                
+                if (string.IsNullOrEmpty(slug))
                 {
-                    ViewData[ViewDataManagerMsgParam] = MsgSomethingIsWrong;
+                    ModelState.AddModelError(ModelStateErrorMsgKey, MsgInvalidSlug);
+                    return View(postEditViewModel);
                 }
 
-                ViewData[ViewDataManagerMsgParam] = MsgPostUpdated;
-                return View(postEditViewModel);
+                var slugIsUnique = await _postRepo.CheckIfSlugIsUnique(slug, postEditViewModel.PostId);
+
+                if (!slugIsUnique)
+                {
+                    ModelState.AddModelError(ModelStateErrorMsgKey, MsgDuplicateSlug);
+                    return View(postEditViewModel);
+                }
+                postEditViewModel.Slug = slug;
+                var updateResult = await _postRepo.UpdatePost(postEditViewModel);
+                if (updateResult) return Redirect(Url.Action("AnyPost", "Blog", new {slug}));
             }
 
-            ViewData[ViewDataManagerMsgParam] = MsgDuplicateSlug;
+            ModelState.AddModelError(ModelStateErrorMsgKey, MsgSomethingIsWrong);
             return View(postEditViewModel);
         }
 
@@ -183,11 +167,35 @@ namespace Blog.Controllers
         public async Task<IActionResult> Delete(string postId)
         {
             var deleteResult = await _postRepo.DeletePost(postId);
+            return RedirectToAction("Index", new {PostDeleted = deleteResult});
+        }
 
-            if (!deleteResult) return RedirectToAction("Index");
+        private async Task<User> GetLoggedInUser()
+        {
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userRepo.GetUserById(currentUserId);
+            return user;
+        }
 
-            TempData[TempDataOperationParam] = MsgPostDeleted;
-            return RedirectToAction("Index");
+        private async Task<PostManagerViewModel> CreatePostManagerViewModel(
+            PostManagerSearch searchData, bool postDeleted)
+        {
+            var posts = await GetBlogPosts(searchData);
+            var resultMsg = GetDeleteMsg(postDeleted);
+
+            resultMsg = GetSearchResultMsg(resultMsg, searchData, posts.Any());
+
+            return new PostManagerViewModel
+            {
+                BlogPosts = posts,
+                SearchData = searchData,
+                ResultMsg = resultMsg
+            };
+        }
+
+        private async Task<ICollection<Post>> GetBlogPosts(PostManagerSearch searchData)
+        {
+            return await _postRepo.GetPostsBySearchData(searchData);
         }
 
         private static PostEditViewModel CreatePostEditViewModel(Post post)
@@ -203,11 +211,25 @@ namespace Blog.Controllers
             });
         }
 
-        private async Task<User> GetLoggedInUser()
+        private static string GetDeleteMsg(bool deleteResult)
         {
-            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepo.GetUserById(currentUserId);
-            return user;
+            return deleteResult ? MsgPostDeleted : "";
+        }
+
+        private static string GetSearchResultMsg(string currentMessage,
+            PostManagerSearch searchData, bool anyPosts)
+        {
+            if (anyPosts) return currentMessage;
+            if (searchData != null)
+            {
+                currentMessage = currentMessage + MsgSearchNoResult;
+            }
+            else
+            {
+                currentMessage = currentMessage + MsgBlogIsEmpty;
+            }
+
+            return currentMessage;
         }
     }
 }

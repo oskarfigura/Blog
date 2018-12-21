@@ -13,10 +13,9 @@ namespace Blog.Controllers
 {
     public class BlogController : Controller
     {
-        private const string TempDataOperationParam = "PostOperationResult";
-        private const string MsgSomethingIsWrong = "Something went wrong. Please try again.";
-        private const string MsgPostDeleted = "Post deleted successfully.";
         private const string CommentsSection = "#comments";
+        private const int TitleHomePageCharLimit = 30;
+        private const string TruncateSymbol = "...";
 
         private readonly IPostRepo _postRepo;
         private readonly IUserRepo _userRepo;
@@ -32,7 +31,7 @@ namespace Blog.Controllers
         {
             var posts = await _postRepo.GetAllPublishedPosts();
 
-            return View(CreateBlogViewModel(posts));
+            return View(CreateBlogViewModel(posts.ToList()));
         }
 
         // GET: Blog/Post, view with post from slug (only published)
@@ -57,7 +56,7 @@ namespace Blog.Controllers
 
         // GET: Blog/AnyPost, view with post from slug (published or unpublished)
         [Authorize(Policy = "CanAccessPostManager")]
-        [ActionName("Post")]
+        [ActionName("AnyPost")]
         [Route("/Blog/AnyPost/{slug?}")]
         public async Task<IActionResult> AnyPost(string slug)
         {
@@ -73,7 +72,7 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            return View(CreatePostViewModel(post));
+            return View("Post", CreatePostViewModel(post));
         }
 
         // POST: Blog/Delete, process deleting a post
@@ -83,30 +82,29 @@ namespace Blog.Controllers
         public async Task<IActionResult> Delete(string postId)
         {
             var deleteResult = await _postRepo.DeletePost(postId);
-
-            TempData[TempDataOperationParam] = MsgSomethingIsWrong;
-            if (!deleteResult) return RedirectToAction("Index", "PostManager");
-
-            TempData[TempDataOperationParam] = MsgPostDeleted;
-            return RedirectToAction("Index", "PostManager");
+            return RedirectToAction("Index", "PostManager",
+                new {PostDeleted = deleteResult});
         }
 
         // POST: Blog/AddComment, process adding a comment
         [Authorize(Policy = "CanComment")]
         [HttpPost, ActionName("AddComment")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddComment(string comment, string postId, string postSlug)
+        public async Task<IActionResult> AddComment(string comment,
+            string postId, string postSlug)
         {
             var user = await GetLoggedInUser();
             var post = await _postRepo.GetPostById(postId);
-            var result = await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
+            await _postRepo.AddComment(BlogUtils.CreateComment(user, comment, post));
 
-            if (result != null)
+            if (post.IsPublished)
             {
-                return Redirect(Url.Action("Post", new { slug = postSlug }) + CommentsSection);
+                return Redirect(Url.Action("Post",
+                                    new {slug = postSlug}) + CommentsSection);
             }
 
-            return RedirectToAction("Post", new { slug = postSlug });
+            return Redirect(Url.Action("AnyPost",
+                                new {slug = postSlug}) + CommentsSection);
         }
 
         // POST: Blog/Delete, process deleting a comment
@@ -121,7 +119,8 @@ namespace Blog.Controllers
             }
 
             await _postRepo.DeleteComment(commentId);
-            return Redirect(Url.Action("Post", new { slug = postSlug }) + CommentsSection);
+            return Redirect(Url.Action("Post",
+                                new {slug = postSlug}) + CommentsSection);
         }
 
         private static PostViewModel CreatePostViewModel(Post post)
@@ -139,12 +138,25 @@ namespace Blog.Controllers
             });
         }
 
-        private static BlogViewModel CreateBlogViewModel(IEnumerable<Post> posts)
+        private static BlogViewModel CreateBlogViewModel(IList<Post> posts)
         {
+            foreach (var post in posts)
+            {
+                post.Title = TruncatePostTitle(post.Title);
+            }
+
             return (new BlogViewModel()
             {
                 BlogPosts = posts.OrderByDescending(p => p.PubDate)
             });
+        }
+
+        private static string TruncatePostTitle(string title)
+        {
+            if (string.IsNullOrEmpty(title) ||
+                title.Length < TitleHomePageCharLimit) return title;
+            title = title.Substring(0, TitleHomePageCharLimit);
+            return title + TruncateSymbol;
         }
 
         private async Task<User> GetLoggedInUser()

@@ -9,8 +9,8 @@ namespace Blog.Areas.Identity.Data
 {
     public interface IUserRepo : IDisposable
     {
-        Task<IEnumerable<User>> GetUsersBySearchData(AccountSearch searchModel);
-        Task<IEnumerable<IdentityRole>> GetAllRoles();
+        Task<ICollection<User>> GetUsersBySearchData(AccountSearch searchModel);
+        Task<ICollection<IdentityRole>> GetAllRoles();
         Task<User> GetUserById(string userId);
         Task<User> GetUserByUserName(string userName);
         Task<bool> CheckIfEmailIsUnique(string email, string userId);
