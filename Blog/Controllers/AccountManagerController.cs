@@ -1,8 +1,10 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
 using Blog.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Blog.Controllers
@@ -10,15 +12,13 @@ namespace Blog.Controllers
     [Authorize(Policy = "CanAccessAccountManager")]
     public class AccountManagerController : Controller
     {
+        private const string ModelStateErrorMsgKey = "errorMsg";
         private const string MsgUnexpectedError = "Something went wrong. Please try again.";
         private const string MsgUserDeleted = "User deleted successfully.";
         private const string MsgDuplicateEmail = "Email already exists, please enter a different email.";
 
         private const string MsgCannotDeleteYourself = "You cannot delete yourself from account manager! " +
                                                        "Please do it in your profile settings.";
-
-        private const string ModelStateErrorMsgKey = "errorMsg";
-
         private readonly IUserRepo _userRepo;
 
         public AccountManagerController(IUserRepo userRepo)
@@ -26,7 +26,7 @@ namespace Blog.Controllers
             _userRepo = userRepo;
         }
 
-        [HttpGet]
+        // GET: AccountManager, account manager home page
         public async Task<IActionResult> Index(AccountManagerViewModel accountManagerViewModel)
         {
             var accountSearchData = accountManagerViewModel.AccountSearch;
@@ -50,10 +50,7 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            return View(new AccountViewModel
-            {
-                UserAccount = user
-            });
+            return View(CreateAccountViewModel(user));
         }
 
         // GET: AccountManager/Edit, view for editing account details 
@@ -73,47 +70,43 @@ namespace Blog.Controllers
                 return NotFound();
             }
 
-            return View(new AccountViewModel
-            {
-                UserAccount = user,
-                AvailableIdentityRoles = availableRoles
-            });
+            return View(CreateAccountEditViewModel(user, availableRoles));
         }
 
         // POST: AccountManager/Edit, process a change of account details
         [Authorize(Policy = "CanEditUsers")]
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(AccountViewModel accountViewModel)
+        public async Task<IActionResult> Edit(AccountEditViewModel accountEditViewModel)
         {
             //Populate available list of roles after form post cleared the list
-            accountViewModel.AvailableIdentityRoles = await _userRepo.GetAllRoles();
+            accountEditViewModel.AvailableIdentityRoles = await _userRepo.GetAllRoles();
 
             if (ModelState.IsValid)
             {
                 var emailIsUnique = await _userRepo
-                    .CheckIfEmailIsUnique(accountViewModel.UserAccount.Email,
-                        accountViewModel.UserAccount.Id);
+                    .CheckIfEmailIsUnique(accountEditViewModel.UserAccount.Email,
+                        accountEditViewModel.UserAccount.Id);
 
                 if (!emailIsUnique)
                 {
                     ModelState.AddModelError(ModelStateErrorMsgKey, MsgDuplicateEmail);
-                    return View(accountViewModel);
+                    return View(accountEditViewModel);
                 }
 
-                var result = await _userRepo.UpdateUser(accountViewModel.UserAccount);
+                var result = await _userRepo.UpdateUser(accountEditViewModel.UserAccount);
                 if (result)
                 {
                     return RedirectToAction("Details",
-                        new {userName = accountViewModel.UserAccount.UserName});
+                        new {userName = accountEditViewModel.UserAccount.UserName});
                 }
             }
 
             ModelState.AddModelError(ModelStateErrorMsgKey, MsgUnexpectedError);
-            return View(accountViewModel);
+            return View(accountEditViewModel);
         }
 
-        // POST: AccountManager/Delete, process deleting account
+        // POST: AccountManager/Delete, process deleting an account
         [Authorize(Policy = "CanDeleteUsers")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -151,6 +144,7 @@ namespace Blog.Controllers
                 });
         }
 
+        //Returns currently logged in user
         private async Task<User> GetLoggedInUser()
         {
             var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -170,21 +164,25 @@ namespace Blog.Controllers
             };
         }
 
-        private async Task<AccountManagerViewModel> CreateAccountManagerViewModel()
+        private static AccountViewModel CreateAccountViewModel(User user)
         {
-            var searchData = new AccountSearch();
-            return new AccountManagerViewModel
+            return new AccountViewModel()
             {
-                Accounts = await _userRepo.GetUsersBySearchData(searchData),
-                AvailableIdentityRoles = await _userRepo.GetAllRoles(),
-                AccountSearch = searchData,
-                ResultMsg = ""
+                UserAccount = user
             };
         }
 
-        /**
-         * Decodes which info message should be shown to user based on operation result
-         */
+        private static AccountEditViewModel CreateAccountEditViewModel(User user, 
+            ICollection<IdentityRole> availableRoles)
+        {
+            return new AccountEditViewModel()
+            {
+                UserAccount = user,
+                AvailableIdentityRoles = availableRoles
+            };
+        }
+
+        //Decodes which info message should be shown to user based on operation result
         private static string GetResultMsg(int statusValue)
         {
             var message = "";
