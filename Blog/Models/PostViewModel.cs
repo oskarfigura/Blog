@@ -29,11 +29,6 @@ namespace Blog.Models
         [Display(Name = "Date Posted")]
         public DateTime PubDate { get; set; }
 
-        [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM-dd-yyyy hh:mm tt}")]
-        [Display(Name = "Date Edited")]
-        public DateTime EditDate { get; set; }
-
         [Required]
         [DataType(DataType.Text)]
         [StringLength(200, MinimumLength = 3,

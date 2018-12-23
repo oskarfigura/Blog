@@ -7,9 +7,7 @@ using Blog.Areas.Identity.Data;
 
 namespace Blog.Models
 {
-    /**
-     * Used for displaying account data including the role
-     */
+    //Used for displaying account data including the role
     public class User : BlogUser
     {
         [Required]

@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace Blog.Models
 {
-    /**
-     * Model used when using account manager and searching the list
-     */
+    // Used for account manager and searching the list
     public class AccountSearch
     {
         [Display(Name = "User Name")]

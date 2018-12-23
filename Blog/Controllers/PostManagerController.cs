@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Blog.Areas.Identity.Data;
 using Blog.Models;
 using Blog.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace Blog.Controllers
 {
@@ -36,32 +30,12 @@ namespace Blog.Controllers
             _userRepo = userRepo;
         }
 
-        // GET: PostManager/ post manager home view with a list of all posts
+        // GET: PostManager, post manager home view with a list of all posts
         public async Task<IActionResult> Index(PostManagerViewModel postManagerView)
         {
-            //TODO Run this method to store posts which will be used for db seeding in the future
-            //TODO StoreAllPostsInJsonFile();
             return View(await CreatePostManagerViewModel(
                 postManagerView.SearchData,
                 postManagerView.PostDeleted));
-        }
-
-        //TODO Delete after testing is done, only used to save posts created in web, ready for db seeding
-        private async void StoreAllPostsInJsonFile()
-        {
-            var posts = await _postRepo.GetAllPosts();
-
-            var json = JsonConvert.SerializeObject(new
-            {
-                posts
-            });
-
-            const string path = @"Areas/Identity/Data/BlogPosts/posts.json";
-
-            using (var file = new StreamWriter(path))
-            {
-                file.WriteLine(json);
-            }
         }
 
         // GET: PostManager/AddPost, view for adding a new post

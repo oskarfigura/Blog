@@ -31,9 +31,7 @@ namespace Blog.Utils
             return result;
         }
 
-        /**
-        * Formats user input slug into a valid slug that can be used in a url
-        */
+        //Formats user input slug into a valid slug that can be used in a url
         public static string CreateSlug(string slug)
         {
             slug = slug.ToLowerInvariant().Replace(" ", "-");
@@ -56,9 +54,7 @@ namespace Blog.Utils
             };
         }
 
-        /**
-         * Used to remove unwanted characters from slug
-         */
+        //Used to remove unwanted characters from slug
         private static string RemoveReservedUrlCharacters(string text)
         {
             var reservedCharacters = new List<string>
@@ -76,9 +72,7 @@ namespace Blog.Utils
             return text;
         }
 
-        /**
-         * Used to remove unwanted diacritics from slug
-         */
+        //Used to remove unwanted diacritics from slug
         private static string RemoveDiacritics(string text)
         {
             var normalizedString = text.Normalize(NormalizationForm.FormD);
@@ -96,9 +90,7 @@ namespace Blog.Utils
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
         }
 
-        /**
-         * Removes repeated hyphens from text
-         */
+        //Removes repeated hyphens from text
         private static string RemoveRepeatedHyphens(string text)
         {
             var initialTrim = Regex.Replace(text, "-+", "-");
