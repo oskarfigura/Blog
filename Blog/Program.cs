@@ -24,9 +24,8 @@ namespace Blog
                 try
                 {
                     var serviceProvider = services.GetRequiredService<IServiceProvider>();
-                    var configuration = services.GetRequiredService<IConfiguration>();
-                    DbInitializer dbInitializer = new DbInitializer();
-                    dbInitializer.SeedDb(serviceProvider, configuration).Wait();
+                    var dbInitializer = new DbInitializer(serviceProvider);
+                    dbInitializer.SeedDb().Wait();
                 }
                 catch (Exception exception)
                 {

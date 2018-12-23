@@ -1,16 +1,12 @@
 ﻿using Blog.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 
 namespace Blog.Areas.Identity.Data
@@ -45,26 +41,33 @@ namespace Blog.Areas.Identity.Data
         private const string CreatingPostsClaim = "CanCreatePosts";
         private const string DeletingPostsClaim = "CanDeletePosts";
 
-        //Seed database with default data 
-        public async Task SeedDb(IServiceProvider serviceProvider, IConfiguration configuration)
+        private readonly UserManager<BlogUser> _userManager;
+        private static RoleManager<IdentityRole> _roleManager;
+        private readonly BlogContext _context;
+
+        public DbInitializer(IServiceProvider serviceProvider)
         {
-            var context = serviceProvider.GetRequiredService<BlogContext>();
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<BlogUser>>();
-            await SeedRoles(roleManager);
-            await SeedUsers(userManager);
-            //SeedBlogPosts -> 
-            //ReadBlogPosts();    //TODO Reading blog posts from file
+            _context = serviceProvider.GetRequiredService<BlogContext>();
+            _roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            _userManager = serviceProvider.GetRequiredService<UserManager<BlogUser>>();
+        }
+
+        //Seed database with default data 
+        public async Task SeedDb()
+        {
+            await SeedRoles();
+            await SeedUsers();
+            await SeedBlogPosts();
         }
 
         //Seed database with roles
-        private async Task SeedRoles(RoleManager<IdentityRole> roleManager)
+        private async Task SeedRoles()
         {
             string[] roleNames = {AdminRole, EditorRole, FollowerRole};
 
             foreach (var roleName in roleNames)
             {
-                var roleExists = await roleManager.RoleExistsAsync(roleName);
+                var roleExists = await _roleManager.RoleExistsAsync(roleName);
 
                 if (!roleExists)
                 {
@@ -74,140 +77,190 @@ namespace Blog.Areas.Identity.Data
                         NormalizedName = roleName.ToUpper()
                     };
 
-                    var roleResult = await roleManager.CreateAsync(role);
+                    var roleResult = await _roleManager.CreateAsync(role);
                     if (roleResult.Succeeded)
                     {
-                        await SeedRoleClaims(roleManager, role);
+                        await SeedRoleClaims(role);
                     }
                 }
             }
         }
 
         //Seed the db with role claims
-        private async Task SeedRoleClaims(RoleManager<IdentityRole> roleManager, IdentityRole role)
+        private async Task SeedRoleClaims(IdentityRole role)
         {
             var roleName = role.Name;
 
             if (roleName.Equals(AdminRole))
             {
-                string[] claims =
-                {
-                    CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
-                    CreatingPostsClaim, DeletingPostsClaim, EditingUsersClaim, AccessingPostManagerClaim,
-                    DeletingUsersClaim, AccessingAccountManagerClaim, ChangingUserPermissionsClaim
-                };
-
-                await AddClaimsToRole(claims, roleManager, role);
+                await SeedAdminRoleClaims(role);
             }
             else if (roleName.Equals(EditorRole))
             {
-                string[] claims =
-                {
-                    CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
-                    CreatingPostsClaim, DeletingPostsClaim, AccessingPostManagerClaim
-                };
-
-                await AddClaimsToRole(claims, roleManager, role);
+                await SeedEditorRoleClaims(role);
             }
             else if (roleName.Equals(FollowerRole))
             {
-                string[] claims = {CreatingCommentsClaim};
-                await AddClaimsToRole(claims, roleManager, role);
+                await SeedFollowerRoleClaims(role);
             }
         }
 
-        //Add claims to a role
-        private async Task AddClaimsToRole(string[] claims, RoleManager<IdentityRole> roleManager, IdentityRole role)
+        //Seed admin role with admin claims
+        private async Task SeedAdminRoleClaims(IdentityRole role)
         {
-            var roleClaimList = (await roleManager.GetClaimsAsync(role)).Select(p => p.Type);
+            string[] claims =
+            {
+                CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
+                CreatingPostsClaim, DeletingPostsClaim, EditingUsersClaim, AccessingPostManagerClaim,
+                DeletingUsersClaim, AccessingAccountManagerClaim, ChangingUserPermissionsClaim
+            };
+
+            await AddClaimsToRole(claims, role);
+        }
+
+        //Seed editor role with editor claims
+        private async Task SeedEditorRoleClaims(IdentityRole role)
+        {
+            string[] claims =
+            {
+                CreatingCommentsClaim, DeletingCommentsClaim, EditingPostsClaim,
+                CreatingPostsClaim, DeletingPostsClaim, AccessingPostManagerClaim
+            };
+
+            await AddClaimsToRole(claims, role);
+        }
+
+        //Seed follower role with follower claims
+        private async Task SeedFollowerRoleClaims(IdentityRole role)
+        {
+            string[] claims = { CreatingCommentsClaim };
+            await AddClaimsToRole(claims, role);
+        }
+
+        //Add claims to a role
+        private async Task AddClaimsToRole(string[] claims, IdentityRole role)
+        {
+            var roleClaimList = (await _roleManager.GetClaimsAsync(role)).Select(p => p.Type);
 
             foreach (var claim in claims)
             {
                 if (!roleClaimList.Contains(claim))
                 {
-                    await roleManager.AddClaimAsync(role, new Claim(claim, "true"));
+                    await _roleManager.AddClaimAsync(role, new Claim(claim, "true"));
                 }
             }
         }
 
         //Seeds the db with users
-        private async Task SeedUsers(UserManager<BlogUser> userManager)
+        private async Task SeedUsers()
         {
             string[] defaultUsers = AdminUsers.Concat(EditorUsers).Concat(FollowerUsers).ToArray();
 
             //Create users and seed to database
             foreach (var username in defaultUsers)
             {
-                var blogUser = await userManager.FindByEmailAsync(username + DefaultEmail);
+                var blogUser = await FindUser(username + DefaultEmail);
 
                 //Check if this user already exists
                 if (blogUser == null)
                 {
-                    var newUser = new BlogUser
-                    {
-                        Name = username,
-                        DisplayName = username,
-                        UserName = username + DefaultEmail,
-                        Email = username + DefaultEmail
-                    };
-
-                    var result = await userManager.CreateAsync(newUser, DefaultPassword);
+                    var newUser = CreateUser(username);
+                    var result = await _userManager.CreateAsync(newUser, DefaultPassword);
 
                     //Add roles and claims to users
                     if (result.Succeeded)
                     {
-                        await SeedUserRoles(newUser, userManager);
+                        await SeedUserRoles(newUser);
                     }
                 }
             }
         }
 
         //Seeds the db with user roles
-        private async Task SeedUserRoles(BlogUser newUser, UserManager<BlogUser> userManager)
+        private async Task SeedUserRoles(BlogUser newUser)
         {
             var username = newUser.UserName;
 
             if (AdminUsers.Any(x => (x + DefaultEmail).Contains(username)))
             {
-                await userManager.AddToRoleAsync(newUser, AdminRole);
+                await _userManager.AddToRoleAsync(newUser, AdminRole);
             }
             else if (EditorUsers.Any(x => (x + DefaultEmail).Contains(username)))
             {
-                await userManager.AddToRoleAsync(newUser, EditorRole);
+                await _userManager.AddToRoleAsync(newUser, EditorRole);
             }
             else if (FollowerUsers.Any(x => (x + DefaultEmail).Contains(username)))
             {
-                await userManager.AddToRoleAsync(newUser, FollowerRole);
+                await _userManager.AddToRoleAsync(newUser, FollowerRole);
             }
         }
 
-        //        private async Task SeedBlogPosts()
-        //        {
-        //          readBlogPosts() --> Seed the db using this data
-        //        }
+        //Seeds the db with example blog posts from file
+        private async Task SeedBlogPosts()
+        {
+            var postList = ReadBlogPostsFromFile();
+            foreach (var post in postList)
+            {
+                await SeedBlogPost(post);
+            }
+        }
 
-        private void ReadBlogPosts()
+        //Seeds the db with example blog post
+        private async Task SeedBlogPost(Post post)
+        {
+            var user = await FindUser(post.AuthorUserName);
+            post.AuthorId = user.Id;
+
+            var result = await FindPost(post.Id);
+
+            if (result == null)
+            {
+                await _context.Posts.AddAsync(post);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        //Finds post by id
+        private async Task<Post> FindPost(string id)
+        {
+            return await _context.Posts.FindAsync(id);
+        }
+
+        //Finds user by email since email is used as username
+        private async Task<BlogUser> FindUser(string email)
+        {
+           return await _userManager.FindByEmailAsync(email);
+        }
+
+        //Reads example blog posts from a file
+        private static List<Post> ReadBlogPostsFromFile()
         {
             var data = "";
             const string path = @"Areas/Identity/Data/BlogPosts/posts.json";
 
-            using (var file = new StreamReader(path))
+            if (File.Exists(path))
             {
-                data = file.ReadToEnd();
+                using (var file = new StreamReader(path))
+                {
+                    data = file.ReadToEnd();
+                }
             }
 
             var result = JsonConvert.DeserializeObject<PostJsonResult>(data);
 
-            foreach (var post in result.Posts)
+            return result.Posts;
+        }
+
+        //Creates a user profile from username
+        private static BlogUser CreateUser(string username)
+        {
+            return new BlogUser()
             {
-                /*
-                 *
-                 * var user = await userManager.FindByNameAsync(post.AuthorUserName);
-                 * post.AuthorId = user.Id;
-                 */
-                //Check user for each post and get userId
-                //Seed db with post
-            }
+                Name = username,
+                DisplayName = username,
+                UserName = username + DefaultEmail,
+                Email = username + DefaultEmail
+            };
         }
     }
 }

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Blog.Models;
-using Microsoft.AspNetCore.Server.Kestrel.Transport.Abstractions.Internal;
 using Newtonsoft.Json;
 
 namespace Blog.Areas.Identity.Data
