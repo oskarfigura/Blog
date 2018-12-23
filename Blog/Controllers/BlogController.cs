@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -34,7 +33,7 @@ namespace Blog.Controllers
             return View(CreateBlogViewModel(posts.ToList()));
         }
 
-        // GET: Blog/Post, view with post from slug (only published)
+        // GET: Blog/Post, view with post based on slug (only published)
         [ActionName("Post")]
         [Route("/Blog/Post/{slug?}")]
         public async Task<IActionResult> Post(string slug)
