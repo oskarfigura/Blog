@@ -179,9 +179,7 @@ namespace Blog.Areas.Identity.Data
             }
         }
 
-        /**
-         * Used for checking if slug is unique when editing a post
-         */
+        //Used for checking if slug is unique when editing a post
         public async Task<bool> CheckIfSlugIsUnique(string slug, string postId)
         {
             var postContainingSlug = await _context.Posts
@@ -190,9 +188,7 @@ namespace Blog.Areas.Identity.Data
             return postContainingSlug.Count == 0;
         }
 
-        /**
-         * Used for checking if slug is unique for new posts that do not have id
-         */
+        //Used for checking if slug is unique for new posts that do not have id
         public async Task<bool> CheckIfSlugIsUnique(string slug)
         {
             var postContainingSlug = await _context.Posts
@@ -201,6 +197,7 @@ namespace Blog.Areas.Identity.Data
             return postContainingSlug.Count == 0;
         }
 
+        //Save changes
         public async Task Save()
         {
             await _context.SaveChangesAsync();
@@ -225,9 +222,7 @@ namespace Blog.Areas.Identity.Data
             this._disposed = true;
         }
 
-        /**
-         * Create new post from view model
-         */
+        //Create new post from view model
         private static Post CreatePost(PostCreateViewModel post, User author)
         {
             return new Post
@@ -242,6 +237,5 @@ namespace Blog.Areas.Identity.Data
                 AuthorId = author.Id
             };
         }
-
     }
 }

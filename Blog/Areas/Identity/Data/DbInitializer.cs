@@ -42,8 +42,9 @@ namespace Blog.Areas.Identity.Data
         private const string DeletingPostsClaim = "CanDeletePosts";
 
         private readonly UserManager<BlogUser> _userManager;
-        private static RoleManager<IdentityRole> _roleManager;
         private readonly BlogContext _context;
+
+        private static RoleManager<IdentityRole> _roleManager;
 
         public DbInitializer(IServiceProvider serviceProvider)
         {
@@ -71,13 +72,9 @@ namespace Blog.Areas.Identity.Data
 
                 if (!roleExists)
                 {
-                    var role = new IdentityRole
-                    {
-                        Name = roleName,
-                        NormalizedName = roleName.ToUpper()
-                    };
-
+                    var role = CreateRole(roleName);
                     var roleResult = await _roleManager.CreateAsync(role);
+
                     if (roleResult.Succeeded)
                     {
                         await SeedRoleClaims(role);
@@ -230,6 +227,16 @@ namespace Blog.Areas.Identity.Data
         private async Task<BlogUser> FindUser(string email)
         {
            return await _userManager.FindByEmailAsync(email);
+        }
+
+        //Create identity role
+        private static IdentityRole CreateRole(string name)
+        {
+            return new IdentityRole()
+            {
+                Name = name,
+                NormalizedName = name.ToUpper()
+            };
         }
 
         //Reads example blog posts from a file

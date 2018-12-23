@@ -1,5 +1,4 @@
-﻿using Blog.Areas.Identity.Data;
-using Blog.Models;
+﻿using Blog.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -21,9 +20,7 @@ namespace Blog.Areas.Identity.Data
             _userManager = userManager;
         }
 
-        /**
-         * Find users using search data 
-         */
+        //Find users using search data 
         public async Task<ICollection<User>> GetUsersBySearchData(AccountSearch searchModel)
         {
             var result = await GetUsers();
@@ -45,17 +42,13 @@ namespace Blog.Areas.Identity.Data
             return result.ToList();
         }
 
-        /**
-         * Return all available user roles
-         */
+        //Return all available user roles
         public async Task<ICollection<IdentityRole>> GetAllRoles()
         {
             return await _context.Roles.ToListAsync();
         }
 
-        /**
-         * Find user by user id
-         */
+        //Find user by user id
         public async Task<User> GetUserById(string userId)
         {
             var user = new User();
@@ -69,9 +62,7 @@ namespace Blog.Areas.Identity.Data
             return user;
         }
 
-        /**
-         * Find user by user name
-         */
+        //Find user by user name
         public async Task<User> GetUserByUserName(string userName)
         {
             var user = new User();
@@ -91,9 +82,7 @@ namespace Blog.Areas.Identity.Data
             }
         }
 
-        /**
-         * Update user including personal data and role
-         */
+        //Update user including personal data and role
         public async Task<bool> UpdateUser(User updatedUser)
         {
             var oldUser = await _userManager.FindByIdAsync(updatedUser.Id);
@@ -106,9 +95,7 @@ namespace Blog.Areas.Identity.Data
             return dataUpdateResult && roleUpdateResult;
         }
 
-        /**
-         * Check email to ensure it doesn't already exist 
-         */
+        //Check email to ensure it doesn't already exist 
         public async Task<bool> CheckIfEmailIsUnique(string email, string userId)
         {
             var user = await GetUserByEmail(email);
@@ -119,9 +106,7 @@ namespace Blog.Areas.Identity.Data
             return user.Id == userId;
         }
 
-        /**
-         * Delete user from db
-         */
+        //Delete user from db
         public async Task<bool> DeleteUser(string userName)
         {
             if (string.IsNullOrEmpty(userName)) return false;
@@ -131,6 +116,7 @@ namespace Blog.Areas.Identity.Data
             return result.Succeeded;
         }
 
+        //Save changes
         public async void Save()
         {
             await _context.SaveChangesAsync();
@@ -156,9 +142,7 @@ namespace Blog.Areas.Identity.Data
             this._disposed = true;
         }
 
-        /**
-         * Update user personal data
-         */
+        //Update user personal data
         private async Task<bool> UpdateUserData(User updatedUser, BlogUser oldUser)
         {
             oldUser.Name = updatedUser.Name;
@@ -170,9 +154,7 @@ namespace Blog.Areas.Identity.Data
             return result.Succeeded;
         }
 
-        /**
-         * Replace user old role with new role
-         */
+        //Replace user old role with new role
         private async Task<bool> UpdateUserRole(User updatedUser, BlogUser oldUser)
         {
             var usersRoles = await _userManager.GetRolesAsync(oldUser);
@@ -189,27 +171,21 @@ namespace Blog.Areas.Identity.Data
             return roleRemovingResult && roleAddingResult;
         }
 
-        /**
-         * Removes all of user roles
-         */
+        //Removes all of user roles
         private async Task<bool> RemoveUserFromRoles(BlogUser user, IList<string> usersRoles)
         {
             var result = await _userManager.RemoveFromRolesAsync(user, usersRoles);
             return result.Succeeded;
         }
 
-        /**
-         * Adds user to a role
-         */
+        //Adds user to a role
         private async Task<bool> AddUserToRole(BlogUser user, string role)
         {
             var result = await _userManager.AddToRoleAsync(user, role);
             return result.Succeeded;
         }
 
-        /**
-         * Returns an object that includes the role of a user
-         */
+        //Returns an object that includes the role of a user
         private static User GetAccountView(BlogUser blogUser, string role)
         {
             var user = new User()
@@ -228,9 +204,7 @@ namespace Blog.Areas.Identity.Data
             return user;
         }
 
-        /**
-         * Returns list of all users
-         */
+        // Returns list of all users
         private async Task<ICollection<User>> GetUsers()
         {
             var users = await GetBlogUsersFromDb();
@@ -246,9 +220,7 @@ namespace Blog.Areas.Identity.Data
             return result;
         }
 
-        /**
-         * Find user by email
-         */
+        //Find user by email
         private async Task<User> GetUserByEmail(string email)
         {
             var user = new User();
@@ -268,41 +240,31 @@ namespace Blog.Areas.Identity.Data
             }
         }
 
-        /**
-         * Returns a list of all users from the database
-         */
+        //Returns a list of all users from the database
         private async Task<ICollection<BlogUser>> GetBlogUsersFromDb()
         {
             return await _context.Users.ToListAsync();
         }
 
-        /**
-         * Returns a user with the specified id 
-         */
+        //Returns a user with the specified id 
         private async Task<BlogUser> GetUserByIdFromDb(string userId)
         {
             return await _userManager.FindByIdAsync(userId);
         }
 
-        /**
-         * Returns a user with the specified email address 
-         */
+        //Returns a user with the specified email address 
         private async Task<BlogUser> GetUserByEmailFromDb(string userEmail)
         {
             return await _userManager.FindByEmailAsync(userEmail);
         }
 
-        /**
-         * Returns a user with the specified user name
-         */
+        //Returns a user with the specified user name
         private async Task<BlogUser> GetUserByUserNameFromDb(string userName)
         {
             return await _context.Users.Where(x => x.UserName.Equals(userName)).FirstAsync();
         }
 
-        /**
-         * Returns name of the user role
-         */
+        //Returns name of the user role
         private async Task<string> GetUsersRoleName(string userId)
         {
             var usersRoleId = await GetUsersRoleId(userId);
@@ -311,18 +273,14 @@ namespace Blog.Areas.Identity.Data
             return usersIdentityRole.Name;
         }
 
-        /**
-         * Returns id of the user role
-         */
+        //Returns id of the user role
         private async Task<string> GetUsersRoleId(string userId)
         {
             var identityUserRole = await _context.UserRoles.Where(x => x.UserId.Equals(userId)).FirstAsync();
             return identityUserRole.RoleId;
         }
 
-        /**
-         * Find role using id
-         */
+        //Find role using id
         private async Task<IdentityRole> GetRoleById(string roleId)
         {
             var role = await _context.Roles.FindAsync(roleId);
