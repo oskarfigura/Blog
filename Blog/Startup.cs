@@ -29,6 +29,13 @@ namespace Blog
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+                options.HttpOnly = HttpOnlyPolicy.Always;
+                options.Secure = CookieSecurePolicy.Always;
+            });
+
             services.AddDbContext<BlogContext>(options => options.UseSqlServer(
                 Configuration.GetConnectionString("BlogContextConnection")));
 
@@ -41,13 +48,6 @@ namespace Blog
             services.AddTransient<IPostRepo, PostRepo>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-                options.HttpOnly = HttpOnlyPolicy.Always;
-                options.Secure = CookieSecurePolicy.Always;
-            });
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 
